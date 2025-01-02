@@ -46,6 +46,8 @@ export type ComplianceType = 'openscap' | 'compliance';
 
 export type UserWithAdditionalInfo = {
   [K in keyof User]-?: NonNullable<User[K]>;
+} & {
+  isAdministrator: boolean;
 };
 
 type UserPayload = {
@@ -61,6 +63,11 @@ type UserPasswordPayload = {
 type UserSshKeyPayload = {
   index: number;
   sshKey: string;
+};
+
+type UserAdministratorPayload = {
+  index: number;
+  isAdministrator: boolean;
 };
 
 export type wizardState = {
@@ -384,6 +391,11 @@ export const selectUserSshKeyByIndex =
     return state.wizard.users[userIndex]?.ssh_key;
   };
 
+export const selectUserAdministrator =
+  (userIndex: number) => (state: RootState) => {
+    return state.wizard.users[userIndex].isAdministrator;
+  };
+
 export const selectKernel = (state: RootState) => {
   return state.wizard.kernel;
 };
@@ -409,7 +421,7 @@ export const selectBlueprintDescription = (state: RootState) => {
 };
 
 export const selectFirstBootScript = (state: RootState) => {
-  return state.wizard.firstBoot?.script;
+  return state.wizard.firstBoot.script;
 };
 
 export const selectTimezone = (state: RootState) => {
@@ -859,6 +871,20 @@ export const wizardSlice = createSlice({
         1
       );
     },
+    setUserAdministratorByIndex: (
+      state,
+      action: PayloadAction<UserAdministratorPayload>
+    ) => {
+      const { index, isAdministrator } = action.payload;
+      const user = state.users[index];
+
+      user.isAdministrator = isAdministrator;
+      if (isAdministrator) {
+        user.groups.push('wheel');
+      } else {
+        user.groups = user.groups.filter((group) => group !== 'wheel');
+      }
+    },
   },
 });
 
@@ -933,5 +959,6 @@ export const {
   setUserNameByIndex,
   setUserPasswordByIndex,
   setUserSshKeyByIndex,
+  setUserAdministratorByIndex,
 } = wizardSlice.actions;
 export default wizardSlice.reducer;

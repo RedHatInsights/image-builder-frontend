@@ -609,6 +609,9 @@ const getUsers = (state: RootState): User[] | undefined => {
     if (user.ssh_key !== '') {
       result.ssh_key = user.ssh_key;
     }
+    if (user.groups.length > 0) {
+      result.groups = user.groups;
+    }
     return result as User;
   });
 };
