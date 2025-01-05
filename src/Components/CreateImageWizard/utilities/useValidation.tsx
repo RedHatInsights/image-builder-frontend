@@ -19,6 +19,8 @@ import {
   selectActivationKey,
   selectRegistrationType,
   selectHostname,
+  selectUserNameByIndex,
+  selectUsers,
 } from '../../../store/wizardSlice';
 import {
   getDuplicateMountPoints,
@@ -27,6 +29,7 @@ import {
   isMountpointMinSizeValid,
   isSnapshotValid,
   isHostnameValid,
+  isUserNameValid,
 } from '../validators';
 
 export type StepValidation = {
@@ -153,6 +156,26 @@ export function useHostnameValidation(): StepValidation {
     };
   }
   return { errors: {}, disabledNext: false };
+}
+
+export function useUsersValidation(): StepValidation {
+  const index = 0;
+  const userNameSelector = selectUserNameByIndex(index);
+  const userName = useAppSelector(userNameSelector);
+  const userNameValid = isUserNameValid(userName);
+  const users = useAppSelector(selectUsers);
+  const canProceed =
+    // Case 1: there is no users
+    users.length === 0 ||
+    // Case 2: All fields are empty
+    userNameValid;
+
+  return {
+    errors: {
+      userName: !userNameValid ? 'Invalid user name' : '',
+    },
+    disabledNext: !canProceed,
+  };
 }
 
 export function useDetailsValidation(): StepValidation {
