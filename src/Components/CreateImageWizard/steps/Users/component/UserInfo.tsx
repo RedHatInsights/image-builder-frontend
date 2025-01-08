@@ -13,7 +13,10 @@ import {
   setUserPasswordByIndex,
   setUserSshKeyByIndex,
 } from '../../../../../store/wizardSlice';
-import { HookValidatedInput } from '../../../ValidatedTextInput';
+import {
+  HookPasswordValidatedInput,
+  HookValidatedInput,
+} from '../../../ValidatedTextInput';
 const UserInfo = () => {
   const dispatch = useAppDispatch();
   const index = 0;
@@ -63,7 +66,7 @@ const UserInfo = () => {
         />
       </FormGroup>
       <FormGroup isRequired label="Password">
-        <HookValidatedInput
+        <HookPasswordValidatedInput
           ariaLabel="blueprint user password"
           value={userPassword || ''}
           onChange={(_e, value) => handlePasswordChange(_e, value)}
