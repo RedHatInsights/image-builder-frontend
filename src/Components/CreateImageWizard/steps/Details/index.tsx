@@ -19,7 +19,7 @@ import {
 } from '../../../../store/wizardSlice';
 import { useGenerateDefaultName } from '../../utilities/useGenerateDefaultName';
 import { useDetailsValidation } from '../../utilities/useValidation';
-import { HookValidatedInput } from '../../ValidatedTextInput';
+import { HookValidatedInput } from '../../ValidatedInput';
 
 const DetailsStep = () => {
   const dispatch = useAppDispatch();
@@ -29,14 +29,14 @@ const DetailsStep = () => {
   useGenerateDefaultName();
 
   const handleNameChange = (
-    _event: React.FormEvent<HTMLInputElement>,
+    _event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
     name: string
   ) => {
     dispatch(changeBlueprintName(name));
   };
 
   const handleDescriptionChange = (
-    _event: React.FormEvent<HTMLInputElement>,
+    _event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
     description: string
   ) => {
     dispatch(changeBlueprintDescription(description));
