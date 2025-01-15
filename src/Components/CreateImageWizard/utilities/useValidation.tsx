@@ -21,6 +21,8 @@ import {
   selectHostname,
   selectUserNameByIndex,
   selectUsers,
+  selectUserPasswordByIndex,
+  selectUserSshKeyByIndex,
 } from '../../../store/wizardSlice';
 import {
   getDuplicateMountPoints,
@@ -163,12 +165,18 @@ export function useUsersValidation(): StepValidation {
   const userNameSelector = selectUserNameByIndex(index);
   const userName = useAppSelector(userNameSelector);
   const userNameValid = isUserNameValid(userName);
+  const userPasswordSelector = selectUserPasswordByIndex(index);
+  const userPassword = useAppSelector(userPasswordSelector);
+  const userSshKeySelector = selectUserSshKeyByIndex(index);
+  const userSshKey = useAppSelector(userSshKeySelector);
   const users = useAppSelector(selectUsers);
   const canProceed =
     // Case 1: there is no users
     users.length === 0 ||
     // Case 2: All fields are empty
-    userNameValid;
+    (userName === '' && userPassword === '' && userSshKey === '') ||
+    // Case 3: userName is valid
+    (userName && userNameValid);
 
   return {
     errors: {
@@ -199,7 +207,7 @@ export function useDetailsValidation(): StepValidation {
             .unwrap()
             .then((response: BlueprintsResponse) => {
               if (
-                response?.meta?.count > 0 &&
+                response.meta.count > 0 &&
                 response.data[0].id !== blueprintId
               ) {
                 setUniqueName(false);
