@@ -68,6 +68,13 @@ export const isUserNameValid = (userName: string) => {
   return isLengthValid && isNotNumericOnly && isPatternValid;
 };
 
+export const isSshKeyValid = (sshKey: string) => {
+  const isLengthValid = sshKey !== undefined && sshKey.length >= 2;
+  const isPatternValid =
+    /^(ssh-(rsa|dss|ed25519)|ecdsa-sha2-nistp(256|384|521)) \S+/.test(sshKey);
+  return isLengthValid && isPatternValid;
+};
+
 export const getDuplicateMountPoints = (partitions: Partition[]): string[] => {
   const mountPointSet: Set<string> = new Set();
   const duplicates: string[] = [];
