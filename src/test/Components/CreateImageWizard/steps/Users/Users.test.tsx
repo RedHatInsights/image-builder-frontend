@@ -72,6 +72,42 @@ const addValidUser = async () => {
   await waitFor(() => expect(nextButton).toBeEnabled());
 };
 
+const addInvalidUser = async () => {
+  const user = userEvent.setup();
+  const addUser = await screen.findByRole('button', { name: /add a user/i });
+  expect(addUser).toBeEnabled();
+  await waitFor(() => user.click(addUser));
+  const enterUserName = screen.getByRole('textbox', {
+    name: /blueprint user name/i,
+  });
+  const nextButton = await getNextButton();
+  await waitFor(() => user.type(enterUserName, '..'));
+  await waitFor(() => expect(enterUserName).toHaveValue('..'));
+  const enterSshKey = await screen.findByRole('textbox', {
+    name: /public SSH key/i,
+  });
+  await waitFor(() => user.type(enterSshKey, 'ssh-rsa d'));
+  await waitFor(() => expect(nextButton).toBeDisabled());
+};
+
+const addInvalidSSHKeyUser = async () => {
+  const user = userEvent.setup();
+  const addUser = await screen.findByRole('button', { name: /add a user/i });
+  expect(addUser).toBeEnabled();
+  await waitFor(() => user.click(addUser));
+  const nextButton = await getNextButton();
+
+  const enterSshKey = await screen.findByRole('textbox', {
+    name: /public SSH key/i,
+  });
+  await waitFor(() => user.type(enterSshKey, 'inalid ssh'));
+  const enterUserName = screen.getByRole('textbox', {
+    name: /blueprint user name/i,
+  });
+  await waitFor(() => user.type(enterUserName, 'testInvalidSshKey'));
+  await waitFor(() => expect(nextButton).toBeDisabled());
+};
+
 describe('Step Users', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -144,6 +180,28 @@ describe('Step Users', () => {
       await waitFor(() => {
         expect(receivedRequest).toEqual(expectedRequest);
       });
+    });
+
+    test('with invalid name', async () => {
+      await renderCreateMode();
+      await goToRegistrationStep();
+      await clickRegisterLater();
+      await goToUsersStep();
+      await addInvalidUser();
+      const invalidUserMessage = screen.getByText(/invalid user name/i);
+      await waitFor(() => expect(invalidUserMessage));
+    });
+
+    test('with invalid ssh key', async () => {
+      await renderCreateMode();
+      await goToRegistrationStep();
+      await clickRegisterLater();
+      await goToUsersStep();
+      await addInvalidSSHKeyUser();
+      const invalidUserMessage = screen.getByText(
+        /value does not match pattern:/i
+      );
+      await waitFor(() => expect(invalidUserMessage));
     });
   });
 
