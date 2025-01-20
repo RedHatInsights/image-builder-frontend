@@ -17,6 +17,7 @@ parserOptions:
   project: ["tsconfig.json"]
 plugins:
   - import
+  - disable-autofix
 rules:
   import/order:
     - error
@@ -51,7 +52,7 @@ rules:
       ts-check: true
       minimumDescriptionLength: 5
   "@typescript-eslint/ban-types": off
-  "@typescript-eslint/no-unnecessary-condition": warn
+  disable-autofix/@typescript-eslint/no-unnecessary-condition: warn
   # Temporarily disabled
   jsx-a11y/no-autofocus: off
   rulesdir/forbid-pf-relative-imports: off
