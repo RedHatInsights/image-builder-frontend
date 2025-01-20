@@ -1,17 +1,19 @@
 import React from 'react';
 
-import { Button, FormGroup } from '@patternfly/react-core';
+import { Button, FormGroup, Checkbox } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
 import { GENERATING_SSH_KEY_PAIRS_URL } from '../../../../../constants';
 import { useAppDispatch, useAppSelector } from '../../../../../store/hooks';
 import {
+  selectUserAdministrator,
   selectUserNameByIndex,
   selectUserPasswordByIndex,
   selectUserSshKeyByIndex,
   setUserNameByIndex,
   setUserPasswordByIndex,
   setUserSshKeyByIndex,
+  setUserAdministratorByIndex,
 } from '../../../../../store/wizardSlice';
 import { HookValidatedInput } from '../../../ValidatedTextInput';
 const UserInfo = () => {
@@ -23,6 +25,8 @@ const UserInfo = () => {
   const userPassword = useAppSelector(userPasswordSelector);
   const userSshKeySelector = selectUserSshKeyByIndex(index);
   const userSshKey = useAppSelector(userSshKeySelector);
+  const userIsAdministratorSelector = selectUserAdministrator(index);
+  const userIsAdministrator = useAppSelector(userIsAdministratorSelector);
 
   const handleNameChange = (
     _e: React.FormEvent<HTMLInputElement>,
@@ -43,6 +47,15 @@ const UserInfo = () => {
     value: string
   ) => {
     dispatch(setUserSshKeyByIndex({ index: index, sshKey: value }));
+  };
+
+  const handleCheckboxChange = (
+    _event: React.FormEvent<HTMLInputElement>,
+    value: boolean
+  ) => {
+    dispatch(
+      setUserAdministratorByIndex({ index: index, isAdministrator: value })
+    );
   };
 
   const stepValidation = {
@@ -93,6 +106,16 @@ const UserInfo = () => {
         >
           Learn more about SSH keys
         </Button>
+      </FormGroup>
+      <FormGroup>
+        <Checkbox
+          label="Administrator"
+          isChecked={userIsAdministrator}
+          onChange={(_e, value) => handleCheckboxChange(_e, value)}
+          aria-label="Administrator"
+          id="user Administrator"
+          name="user Administrator"
+        />
       </FormGroup>
     </>
   );

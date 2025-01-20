@@ -145,6 +145,40 @@ describe('Step Users', () => {
         expect(receivedRequest).toEqual(expectedRequest);
       });
     });
+    test('with valid name and password and check the Administrator checkbox', async () => {
+      const user = userEvent.setup();
+      await renderCreateMode();
+      await goToRegistrationStep();
+      await clickRegisterLater();
+      await goToUsersStep();
+      await addValidUser();
+      const isAdmin = screen.getByRole('checkbox', {
+        name: /administrator/i,
+      });
+      user.click(isAdmin);
+      await goToReviewStep();
+      // informational modal pops up in the first test only as it's tied
+      // to a 'imageBuilder.saveAndBuildModalSeen' variable in localStorage
+      //    await openAndDismissSaveAndBuildModal();
+      const receivedRequest = await interceptBlueprintRequest(CREATE_BLUEPRINT);
+
+      const expectedRequest = {
+        ...blueprintRequest,
+        customizations: {
+          users: [
+            {
+              name: 'best',
+              ssh_key: 'ssh-rsa d',
+              groups: ['wheel'],
+            },
+          ],
+        },
+      };
+
+      await waitFor(() => {
+        expect(receivedRequest).toEqual(expectedRequest);
+      });
+    });
   });
 
   describe('Users edit mode', () => {
