@@ -32,6 +32,7 @@ import {
   TimezoneList,
   LocaleList,
   HostnameList,
+  KernelList,
 } from './ReviewStepTextLists';
 
 import isRhel from '../../../../../src/Utilities/isRhel';
@@ -73,12 +74,14 @@ const Review = ({ snapshottingEnabled }: { snapshottingEnabled: boolean }) => {
   const [isExpandedTimezone, setIsExpandedTimezone] = useState(true);
   const [isExpandedLocale, setIsExpandedLocale] = useState(true);
   const [isExpandedHostname, setIsExpandedHostname] = useState(true);
+  const [isExpandedKernel, setIsExpandedKernel] = useState(true);
   const [isExpandableFirstBoot, setIsExpandedFirstBoot] = useState(true);
   const [isExpandedUsers, setIsExpandedUsers] = useState(true);
 
   const isTimezoneEnabled = useFlag('image-builder.timezone.enabled');
   const isLocaleEnabled = useFlag('image-builder.locale.enabled');
   const isHostnameEnabled = useFlag('image-builder.hostname.enabled');
+  const isKernelEnabled = useFlag('image-builder.kernel.enabled');
 
   const onToggleImageOutput = (isExpandedImageOutput: boolean) =>
     setIsExpandedImageOutput(isExpandedImageOutput);
@@ -102,6 +105,8 @@ const Review = ({ snapshottingEnabled }: { snapshottingEnabled: boolean }) => {
     setIsExpandedLocale(isExpandedLocale);
   const onToggleHostname = (isExpandedHostname: boolean) =>
     setIsExpandedHostname(isExpandedHostname);
+  const onToggleKernel = (isExpandedKernel: boolean) =>
+    setIsExpandedKernel(isExpandedKernel);
   const onToggleFirstBoot = (isExpandableFirstBoot: boolean) =>
     setIsExpandedFirstBoot(isExpandableFirstBoot);
   const onToggleUsers = (isExpandedUsers: boolean) =>
@@ -383,6 +388,23 @@ const Review = ({ snapshottingEnabled }: { snapshottingEnabled: boolean }) => {
           data-testid="hostname-expandable"
         >
           <HostnameList />
+        </ExpandableSection>
+      )}
+      {isKernelEnabled && (
+        <ExpandableSection
+          toggleContent={composeExpandable(
+            'Kernel',
+            'revisit-kernel',
+            'wizard-kernel'
+          )}
+          onToggle={(_event, isExpandedKernel) =>
+            onToggleKernel(isExpandedKernel)
+          }
+          isExpanded={isExpandedKernel}
+          isIndented
+          data-testid="kernel-expandable"
+        >
+          <KernelList />
         </ExpandableSection>
       )}
       {isFirstBootEnabled && (

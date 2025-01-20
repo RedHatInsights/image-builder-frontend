@@ -1,10 +1,11 @@
 import type { Router as RemixRouter } from '@remix-run/router';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
 import {
   clickBack,
   clickNext,
+  enterBlueprintName,
   verifyCancelButton,
 } from '../../wizardTestUtils';
 import { clickRegisterLater, renderCreateMode } from '../../wizardTestUtils';
@@ -29,6 +30,29 @@ const goToKernelStep = async () => {
   await clickNext(); // Locale
   await clickNext(); // Hostname
   await clickNext(); // Kernel
+};
+
+const goToReviewStep = async () => {
+  await clickNext(); // First boot script
+  await clickNext(); // Details
+  await enterBlueprintName();
+  await clickNext(); // Review
+};
+
+const selectKernelName = async (kernelName: string) => {
+  const user = userEvent.setup();
+  const kernelNameDropdown = await screen.findByTestId('kernel-name-dropdown');
+  await waitFor(() => user.click(kernelNameDropdown));
+
+  const kernelOption = await screen.findByText(kernelName);
+  await waitFor(() => user.click(kernelOption));
+};
+
+const clickRevisitButton = async () => {
+  const user = userEvent.setup();
+  const expandable = await screen.findByTestId('kernel-expandable');
+  const revisitButton = await within(expandable).findByTestId('revisit-kernel');
+  await waitFor(() => user.click(revisitButton));
 };
 
 describe('Step Kernel', () => {
@@ -58,8 +82,16 @@ describe('Step Kernel', () => {
     await goToKernelStep();
     await verifyCancelButton(router);
   });
+
+  test('revisit step button on Review works', async () => {
+    await renderCreateMode();
+    await goToKernelStep();
+    await selectKernelName('kernel');
+    await goToReviewStep();
+    await clickRevisitButton();
+    await screen.findByRole('heading', { name: /Kernel/ });
+  });
 });
 
-// TO DO 'Kernel step' -> 'revisit step button on Review works'
 // TO DO 'Kernel request generated correctly'
 // TO DO 'Kernel edit mode'
