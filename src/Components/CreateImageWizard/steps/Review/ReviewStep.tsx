@@ -32,6 +32,7 @@ import {
   TimezoneList,
   LocaleList,
   HostnameList,
+  FirewallList,
 } from './ReviewStepTextLists';
 
 import isRhel from '../../../../../src/Utilities/isRhel';
@@ -46,6 +47,7 @@ import {
   selectDistribution,
   selectImageTypes,
   selectRegistrationType,
+  selectFirewall,
 } from '../../../../store/wizardSlice';
 import { useFlag } from '../../../../Utilities/useGetEnvironment';
 
@@ -60,6 +62,7 @@ const Review = ({ snapshottingEnabled }: { snapshottingEnabled: boolean }) => {
   const complianceProfile = useAppSelector(selectComplianceProfileID);
   const compliancePolicy = useAppSelector(selectCompliancePolicyID);
   const registrationType = useAppSelector(selectRegistrationType);
+  const firewall = useAppSelector(selectFirewall);
 
   const [isExpandedImageOutput, setIsExpandedImageOutput] = useState(true);
   const [isExpandedTargetEnvs, setIsExpandedTargetEnvs] = useState(true);
@@ -73,12 +76,14 @@ const Review = ({ snapshottingEnabled }: { snapshottingEnabled: boolean }) => {
   const [isExpandedTimezone, setIsExpandedTimezone] = useState(true);
   const [isExpandedLocale, setIsExpandedLocale] = useState(true);
   const [isExpandedHostname, setIsExpandedHostname] = useState(true);
+  const [isExpandedFirewall, setIsExpandedFirewall] = useState(true);
   const [isExpandableFirstBoot, setIsExpandedFirstBoot] = useState(true);
   const [isExpandedUsers, setIsExpandedUsers] = useState(true);
 
   const isTimezoneEnabled = useFlag('image-builder.timezone.enabled');
   const isLocaleEnabled = useFlag('image-builder.locale.enabled');
   const isHostnameEnabled = useFlag('image-builder.hostname.enabled');
+  const isFirewallEnabled = useFlag('image-builder.firewall.enabled');
 
   const onToggleImageOutput = (isExpandedImageOutput: boolean) =>
     setIsExpandedImageOutput(isExpandedImageOutput);
@@ -102,6 +107,8 @@ const Review = ({ snapshottingEnabled }: { snapshottingEnabled: boolean }) => {
     setIsExpandedLocale(isExpandedLocale);
   const onToggleHostname = (isExpandedHostname: boolean) =>
     setIsExpandedHostname(isExpandedHostname);
+  const onToggleFirewall = (isExpandedFirewall: boolean) =>
+    setIsExpandedFirewall(isExpandedFirewall);
   const onToggleFirstBoot = (isExpandableFirstBoot: boolean) =>
     setIsExpandedFirstBoot(isExpandableFirstBoot);
   const onToggleUsers = (isExpandedUsers: boolean) =>
@@ -385,6 +392,26 @@ const Review = ({ snapshottingEnabled }: { snapshottingEnabled: boolean }) => {
           <HostnameList />
         </ExpandableSection>
       )}
+      {isFirewallEnabled &&
+        (firewall.ports.length > 0 ||
+          firewall.services.disabled.length > 0 ||
+          firewall.services.enabled.length > 0) && (
+          <ExpandableSection
+            toggleContent={composeExpandable(
+              'Firewall',
+              'revisit-firewall',
+              'wizard-firewall'
+            )}
+            onToggle={(_event, isExpandedFirewall) =>
+              onToggleFirewall(isExpandedFirewall)
+            }
+            isExpanded={isExpandedFirewall}
+            isIndented
+            data-testid="firewall-expandable"
+          >
+            <FirewallList />
+          </ExpandableSection>
+        )}
       {isFirstBootEnabled && (
         <ExpandableSection
           toggleContent={composeExpandable(

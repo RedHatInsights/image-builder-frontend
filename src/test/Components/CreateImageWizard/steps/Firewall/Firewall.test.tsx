@@ -1,5 +1,5 @@
 import type { Router as RemixRouter } from '@remix-run/router';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
 import { CREATE_BLUEPRINT } from '../../../../../constants';
@@ -66,6 +66,15 @@ const addDisabledFirewallService = async (service: string) => {
   await waitFor(() => user.type(disabledServiceInput, service.concat(',')));
 };
 
+const clickRevisitButton = async () => {
+  const user = userEvent.setup();
+  const expandable = await screen.findByTestId('firewall-expandable');
+  const revisitButton = await within(expandable).findByTestId(
+    'revisit-firewall'
+  );
+  await waitFor(() => user.click(revisitButton));
+};
+
 describe('Step Firewall', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -117,6 +126,15 @@ describe('Step Firewall', () => {
     expect(screen.queryByText('Invalid format.')).not.toBeInTheDocument();
     await addPort('wrong--service');
     await screen.findByText('Invalid format.');
+  });
+
+  test('revisit step button on Review works', async () => {
+    await renderCreateMode();
+    await goToFirewallStep();
+    await addPort('22:tcp');
+    await goToReviewStep();
+    await clickRevisitButton();
+    await screen.findByRole('heading', { name: /Firewall/ });
   });
 });
 
@@ -204,5 +222,4 @@ describe('Firewall request generated correctly', () => {
   });
 });
 
-// TO DO Step Firewall -> revisit step button on Review works
 // TO DO Firewall edit mode
