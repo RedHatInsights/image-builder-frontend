@@ -138,6 +138,10 @@ export type wizardState = {
   hostname: string;
   firewall: {
     ports: string[];
+    services: {
+      enabled: string[];
+      disabled: string[];
+    };
   };
   metadata?: {
     parent_id: string | null;
@@ -221,6 +225,10 @@ export const initialState: wizardState = {
   hostname: '',
   firewall: {
     ports: [],
+    services: {
+      enabled: [],
+      disabled: [],
+    },
   },
   firstBoot: { script: '' },
   users: [],
@@ -424,8 +432,8 @@ export const selectHostname = (state: RootState) => {
   return state.wizard.hostname;
 };
 
-export const selectPorts = (state: RootState) => {
-  return state.wizard.firewall.ports;
+export const selectFirewall = (state: RootState) => {
+  return state.wizard.firewall;
 };
 
 export const wizardSlice = createSlice({
@@ -800,6 +808,40 @@ export const wizardSlice = createSlice({
     changeDisabledServices: (state, action: PayloadAction<string[]>) => {
       state.services.disabled = action.payload;
     },
+    addEnabledFirewallService: (state, action: PayloadAction<string>) => {
+      if (
+        !state.firewall.services.enabled.some(
+          (service) => service === action.payload
+        )
+      ) {
+        state.firewall.services.enabled.push(action.payload);
+      }
+    },
+    removeEnabledFirewallService: (state, action: PayloadAction<string>) => {
+      state.firewall.services.enabled.splice(
+        state.firewall.services.enabled.findIndex(
+          (service) => service === action.payload
+        ),
+        1
+      );
+    },
+    addDisabledFirewallService: (state, action: PayloadAction<string>) => {
+      if (
+        !state.firewall.services.disabled.some(
+          (service) => service === action.payload
+        )
+      ) {
+        state.firewall.services.disabled.push(action.payload);
+      }
+    },
+    removeDisabledFirewallService: (state, action: PayloadAction<string>) => {
+      state.firewall.services.disabled.splice(
+        state.firewall.services.disabled.findIndex(
+          (service) => service === action.payload
+        ),
+        1
+      );
+    },
     changeKernelAppend: (state, action: PayloadAction<string>) => {
       state.kernel.append = action.payload;
     },
@@ -922,6 +964,10 @@ export const {
   changeEnabledServices,
   changeMaskedServices,
   changeDisabledServices,
+  addDisabledFirewallService,
+  removeDisabledFirewallService,
+  addEnabledFirewallService,
+  removeEnabledFirewallService,
   changeKernelAppend,
   changeTimezone,
   addNtpServer,
