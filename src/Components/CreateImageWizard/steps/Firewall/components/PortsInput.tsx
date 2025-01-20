@@ -6,13 +6,13 @@ import { useAppSelector } from '../../../../../store/hooks';
 import {
   addPort,
   removePort,
-  selectPorts,
+  selectFirewall,
 } from '../../../../../store/wizardSlice';
 import ChippingInput from '../../../ChippingInput';
 import { isPortValid } from '../../../validators';
 
 const PortsInput = () => {
-  const ports = useAppSelector(selectPorts);
+  const ports = useAppSelector(selectFirewall).ports;
 
   return (
     <FormGroup label="Ports">
