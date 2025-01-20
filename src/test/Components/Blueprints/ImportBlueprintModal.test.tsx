@@ -180,6 +180,12 @@ ntpservers = ["0.north-america.pool.ntp.org", "1.north-america.pool.ntp.org"]
 [customizations.locale]
 languages = ["en_US.UTF-8", "ja_JP.UTF-8"]
 keyboard = "us"
+
+[customizations.firewall]
+ports = ["22:tcp", "80:tcp", "imap:tcp"]
+[customizations.firewall.services]
+enabled = ["ftp", "ntp"]
+disabled = ["telnet"]
 `;
 
 const uploadFile = async (filename: string, content: string): Promise<void> => {
@@ -378,5 +384,20 @@ describe('Import modal', () => {
     await clickNext();
     const hostnameInput = await screen.findByPlaceholderText(/Add a hostname/i);
     expect(hostnameInput).toHaveValue('base-image');
+
+    // Kernel
+    await clickNext();
+
+    // Firewall
+    await clickNext();
+    // check ports
+    await screen.findByText('22:tcp');
+    await screen.findByText('80:tcp');
+    await screen.findByText('imap:tcp');
+    // check disabled services
+    await screen.findByText('telnet');
+    // check enabled services
+    await screen.findByText('ftp');
+    await screen.findByText('ntp');
   }, 20000);
 });
