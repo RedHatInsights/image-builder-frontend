@@ -83,7 +83,7 @@ import {
   selectHostname,
   selectUsers,
   selectMetadata,
-  selectPorts,
+  selectFirewall,
 } from '../../../store/wizardSlice';
 import { FileSystemConfigurationType } from '../steps/FileSystem';
 import {
@@ -344,6 +344,10 @@ function commonRequestToState(
     hostname: request.customizations.hostname || '',
     firewall: {
       ports: request.customizations.firewall?.ports || [],
+      services: {
+        enabled: request.customizations.firewall?.services?.enabled || [],
+        disabled: request.customizations.firewall?.services?.disabled || [],
+      },
     },
   };
 }
@@ -712,15 +716,25 @@ const getLocale = (state: RootState) => {
 };
 
 const getFirewall = (state: RootState) => {
-  const ports = selectPorts(state);
+  const ports = selectFirewall(state).ports;
+  const services = selectFirewall(state).services;
 
-  if (ports.length === 0) {
-    return undefined;
-  } else {
-    return {
-      ports: ports,
-    };
+  const firewall = {};
+
+  if (ports.length > 0) {
+    Object.assign(firewall, { ports: ports });
   }
+
+  if (services.enabled.length > 0 || services.disabled.length > 0) {
+    Object.assign(firewall, {
+      services: {
+        enabled: services.enabled.length > 0 ? services.enabled : undefined,
+        disabled: services.disabled.length > 0 ? services.disabled : undefined,
+      },
+    });
+  }
+
+  return Object.keys(firewall).length > 0 ? firewall : undefined;
 };
 
 const getCustomRepositories = (state: RootState) => {

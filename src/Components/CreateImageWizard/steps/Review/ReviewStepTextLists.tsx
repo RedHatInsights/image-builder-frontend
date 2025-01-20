@@ -71,6 +71,7 @@ import {
   selectUserNameByIndex,
   selectUserPasswordByIndex,
   selectUserSshKeyByIndex,
+  selectFirewall,
 } from '../../../../store/wizardSlice';
 import { toMonthAndYear, yyyyMMddFormat } from '../../../../Utilities/time';
 import {
@@ -869,6 +870,48 @@ export const HostnameList = () => {
         </TextListItem>
         <TextListItem component={TextListItemVariants.dd}>
           {hostname ? hostname : 'None'}
+        </TextListItem>
+      </TextList>
+    </TextContent>
+  );
+};
+
+export const FirewallList = () => {
+  const firewall = useAppSelector(selectFirewall);
+
+  return (
+    <TextContent>
+      <TextList component={TextListVariants.dl}>
+        <TextListItem
+          component={TextListItemVariants.dt}
+          className="pf-v5-u-min-width"
+        >
+          Ports
+        </TextListItem>
+        <TextListItem component={TextListItemVariants.dd}>
+          {firewall.ports ? firewall.ports : 'None'}
+        </TextListItem>
+        <TextListItem
+          component={TextListItemVariants.dt}
+          className="pf-v5-u-min-width"
+        >
+          Disabled services
+        </TextListItem>
+        <TextListItem component={TextListItemVariants.dd}>
+          {firewall.services.disabled.length > 0
+            ? firewall.services.disabled
+            : 'None'}
+        </TextListItem>
+        <TextListItem
+          component={TextListItemVariants.dt}
+          className="pf-v5-u-min-width"
+        >
+          Enabled services
+        </TextListItem>
+        <TextListItem component={TextListItemVariants.dd}>
+          {firewall.services.enabled.length > 0
+            ? firewall.services.enabled
+            : 'None'}
         </TextListItem>
       </TextList>
     </TextContent>

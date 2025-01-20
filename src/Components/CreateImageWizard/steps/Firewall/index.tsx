@@ -3,6 +3,7 @@ import React from 'react';
 import { Text, Form, Title } from '@patternfly/react-core';
 
 import PortsInput from './components/PortsInput';
+import Services from './components/Services';
 
 const FirewallStep = () => {
   return (
@@ -12,6 +13,7 @@ const FirewallStep = () => {
       </Title>
       <Text>Customize firewall settings for your image.</Text>
       <PortsInput />
+      <Services />
     </Form>
   );
 };
