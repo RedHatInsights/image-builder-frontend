@@ -31,9 +31,9 @@ import {
   changeDisabledServices,
   removePackage,
   changeFileSystemConfigurationType,
-  changeKernelAppend,
   selectDistribution,
   selectComplianceType,
+  clearKernelAppend,
 } from '../../../../store/wizardSlice';
 import { useGetEnvironment } from '../../../../Utilities/useGetEnvironment';
 
@@ -84,7 +84,7 @@ const OscapStep = () => {
     dispatch(changeEnabledServices([]));
     dispatch(changeMaskedServices([]));
     dispatch(changeDisabledServices([]));
-    dispatch(changeKernelAppend(''));
+    dispatch(clearKernelAppend());
   };
 
   return (

@@ -9,6 +9,7 @@ export const distributionOscapProfiles = (): GetOscapProfilesApiResponse => {
     'xccdf_org.ssgproject.content_profile_cis_workstation_l2',
     'xccdf_org.ssgproject.content_profile_standard',
     'xccdf_org.ssgproject.content_profile_stig_gui',
+    'xccdf_org.ssgproject.content_profile_ccn_basic',
   ];
 };
 
@@ -72,6 +73,19 @@ export const oscapCustomizations = (
       },
       services: {
         enabled: ['crond', 'emacs-service'],
+      },
+    };
+  }
+  if (profile === 'xccdf_org.ssgproject.content_profile_ccn_basic') {
+    return {
+      openscap: {
+        profile_id: 'content_profile_ccn_basic',
+        profile_name: 'Kernel append only profile',
+        profile_description:
+          'This is a mocked profile description. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean posuere velit enim, tincidunt porttitor nisl elementum eu.',
+      },
+      kernel: {
+        append: 'audit_backlog_limit=8192 audit=1',
       },
     };
   }

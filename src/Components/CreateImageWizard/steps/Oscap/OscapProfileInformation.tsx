@@ -134,19 +134,6 @@ export const OscapProfileInformation = ({
                 component={TextListItemVariants.dt}
                 className="pf-v5-u-min-width"
               >
-                Kernel arguments:
-              </TextListItem>
-              <TextListItem component={TextListItemVariants.dd}>
-                <CodeBlock>
-                  <CodeBlockCode>
-                    {oscapProfileInfo?.kernel?.append}
-                  </CodeBlockCode>
-                </CodeBlock>
-              </TextListItem>
-              <TextListItem
-                component={TextListItemVariants.dt}
-                className="pf-v5-u-min-width"
-              >
                 Disabled services:
               </TextListItem>
               <TextListItem component={TextListItemVariants.dd}>

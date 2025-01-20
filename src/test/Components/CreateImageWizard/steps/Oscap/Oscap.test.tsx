@@ -160,8 +160,6 @@ describe('Step OpenSCAP', () => {
     await goToOscapStep();
     await selectProfile();
 
-    await screen.findByText(/kernel arguments:/i);
-    await screen.findByText(/audit_backlog_limit=8192 audit=1/i);
     await screen.findByText(/disabled services:/i);
     await screen.findByText(
       /rpcbind autofs nftables nfs-server emacs-service/i

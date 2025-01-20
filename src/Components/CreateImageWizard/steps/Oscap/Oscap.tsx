@@ -51,8 +51,9 @@ import {
   changeEnabledServices,
   changeMaskedServices,
   changeDisabledServices,
-  changeKernelAppend,
   selectComplianceType,
+  clearKernelAppend,
+  addKernelArg,
 } from '../../../../store/wizardSlice';
 import { useHasSpecificTargetOnly } from '../../utilities/hasSpecificTargetOnly';
 import { parseSizeUnit } from '../../utilities/parseSizeUnit';
@@ -174,7 +175,7 @@ const ProfileSelector = () => {
     clearOscapPackages(currentProfileData?.packages || []);
     dispatch(changeFileSystemConfigurationType('automatic'));
     handleServices(undefined);
-    dispatch(changeKernelAppend(''));
+    dispatch(clearKernelAppend());
   };
 
   const handlePackages = (
@@ -228,6 +229,21 @@ const ProfileSelector = () => {
     dispatch(changeDisabledServices(services?.disabled || []));
   };
 
+  const handleKernelAppend = (kernelAppend: string | undefined) => {
+    dispatch(clearKernelAppend());
+
+    if (kernelAppend) {
+      const kernelArgsArray = kernelAppend.split(' ');
+      for (const arg in kernelArgsArray) {
+        dispatch(
+          addKernelArg({
+            name: kernelArgsArray[arg],
+          })
+        );
+      }
+    }
+  };
+
   const handleSelect = (
     _event: React.MouseEvent<Element, MouseEvent>,
     selection: OScapSelectOptionValueType | ComplianceSelectOptionValueType
@@ -251,7 +267,7 @@ const ProfileSelector = () => {
           handlePartitions(oscapPartitions);
           handlePackages(oldOscapPackages, newOscapPackages);
           handleServices(response.services);
-          dispatch(changeKernelAppend(response.kernel?.append || ''));
+          handleKernelAppend(response.kernel?.append);
           if (complianceType === 'openscap') {
             dispatch(
               changeCompliance({
