@@ -161,6 +161,7 @@ export const mapOnPremToHosted = (
             }
           : undefined,
       hostname: blueprint.customizations?.hostname || undefined,
+      firewall: blueprint.customizations?.firewall || undefined,
     },
     metadata: {
       parent_id: null,
