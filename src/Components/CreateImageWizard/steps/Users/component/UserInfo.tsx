@@ -13,6 +13,7 @@ import {
   setUserPasswordByIndex,
   setUserSshKeyByIndex,
 } from '../../../../../store/wizardSlice';
+import { useUsersValidation } from '../../../utilities/useValidation';
 import { HookValidatedInput } from '../../../ValidatedTextInput';
 const UserInfo = () => {
   const dispatch = useAppDispatch();
@@ -45,10 +46,7 @@ const UserInfo = () => {
     dispatch(setUserSshKeyByIndex({ index: index, sshKey: value }));
   };
 
-  const stepValidation = {
-    errors: {},
-    disabledNext: false,
-  };
+  const stepValidation = useUsersValidation();
 
   return (
     <>
