@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import {
   HelperText,
   HelperTextItem,
+  TextArea,
+  TextAreaProps,
   TextInput,
   TextInputProps,
 } from '@patternfly/react-core';
@@ -19,16 +21,18 @@ interface ValidatedTextInputPropTypes extends TextInputProps {
   placeholder?: string;
 }
 
-interface HookValidatedTextInputPropTypes extends TextInputProps {
-  dataTestId?: string | undefined;
-  ouiaId?: string;
-  ariaLabel: string | undefined;
-  value: string;
-  placeholder?: string;
-  stepValidation: StepValidation;
-  fieldName: string;
-  warning?: string;
-}
+type HookValidatedInputPropTypes = TextInputProps &
+  TextAreaProps & {
+    dataTestId?: string | undefined;
+    ouiaId?: string;
+    ariaLabel: string | undefined;
+    value: string;
+    placeholder?: string;
+    stepValidation: StepValidation;
+    fieldName: string;
+    warning?: string;
+    inputType?: 'textInput' | 'textArea';
+  };
 
 export const HookValidatedInput = ({
   dataTestId,
@@ -41,8 +45,9 @@ export const HookValidatedInput = ({
   stepValidation,
   fieldName,
   type = 'text',
+  inputType,
   warning = undefined,
-}: HookValidatedTextInputPropTypes) => {
+}: HookValidatedInputPropTypes) => {
   const [isPristine, setIsPristine] = useState(!value ? true : false);
   // Do not surface validation on pristine state components
   // Allow step validation to be set on pristine state, when needed
@@ -60,18 +65,31 @@ export const HookValidatedInput = ({
 
   return (
     <>
-      <TextInput
-        value={value}
-        data-testid={dataTestId}
-        ouiaId={ouiaId || ''}
-        type={type}
-        onChange={onChange!}
-        validated={validated}
-        aria-label={ariaLabel || ''}
-        onBlur={handleBlur}
-        placeholder={placeholder || ''}
-        isDisabled={isDisabled || false}
-      />
+      {inputType === 'textArea' ? (
+        <TextArea
+          value={value}
+          data-testid={dataTestId}
+          onChange={onChange!}
+          validated={validated}
+          aria-label={ariaLabel || ''}
+          onBlur={handleBlur}
+          placeholder={placeholder || ''}
+          isDisabled={isDisabled || false}
+        />
+      ) : (
+        <TextInput
+          value={value}
+          data-testid={dataTestId}
+          ouiaId={ouiaId || ''}
+          type={type}
+          onChange={onChange!}
+          validated={validated}
+          aria-label={ariaLabel || ''}
+          onBlur={handleBlur}
+          placeholder={placeholder || ''}
+          isDisabled={isDisabled || false}
+        />
+      )}
       {validated === 'error' && (
         <HelperText>
           <HelperTextItem variant="error" hasIcon>
@@ -90,7 +108,7 @@ export const HookValidatedInput = ({
   );
 };
 
-export const ValidatedTextInput = ({
+export const ValidatedInput = ({
   dataTestId,
   ouiaId,
   ariaLabel,

@@ -31,7 +31,7 @@ import {
   selectAzureSubscriptionId,
   selectAzureTenantId,
 } from '../../../../../store/wizardSlice';
-import { ValidatedTextInput } from '../../../ValidatedTextInput';
+import { ValidatedInput } from '../../../ValidatedInput';
 import {
   isAzureResourceGroupValid,
   isAzureSubscriptionIdValid,
@@ -159,7 +159,7 @@ const Azure = () => {
       {shareMethod === 'manual' && (
         <>
           <FormGroup label="Azure tenant GUID" isRequired>
-            <ValidatedTextInput
+            <ValidatedInput
               ariaLabel="Azure tenant GUID"
               value={tenantId || ''}
               validator={isAzureTenantGUIDValid}
@@ -169,7 +169,7 @@ const Azure = () => {
           </FormGroup>
           <AzureAuthButton />
           <FormGroup label="Subscription ID" isRequired>
-            <ValidatedTextInput
+            <ValidatedInput
               ariaLabel="subscription id"
               value={subscriptionId}
               validator={isAzureSubscriptionIdValid}
@@ -180,7 +180,7 @@ const Azure = () => {
             />
           </FormGroup>
           <FormGroup label="Resource group" isRequired>
-            <ValidatedTextInput
+            <ValidatedInput
               ariaLabel="resource group"
               value={resourceGroup}
               validator={isAzureResourceGroupValid}

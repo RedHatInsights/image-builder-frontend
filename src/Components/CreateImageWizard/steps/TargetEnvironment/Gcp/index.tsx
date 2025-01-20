@@ -11,7 +11,7 @@ import {
   selectGcpEmail,
   selectGcpShareMethod,
 } from '../../../../../store/wizardSlice';
-import { ValidatedTextInput } from '../../../ValidatedTextInput';
+import { ValidatedInput } from '../../../ValidatedInput';
 import { isGcpEmailValid } from '../../../validators';
 
 export type GcpShareMethod = 'withGoogle' | 'withInsights';
@@ -129,7 +129,7 @@ const Gcp = () => {
             }
             isRequired
           >
-            <ValidatedTextInput
+            <ValidatedInput
               ariaLabel="google principal"
               dataTestId="principal"
               value={gcpEmail || ''}

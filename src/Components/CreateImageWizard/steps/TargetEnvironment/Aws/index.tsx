@@ -26,7 +26,7 @@ import {
   selectAwsAccountId,
   selectAwsShareMethod,
 } from '../../../../../store/wizardSlice';
-import { ValidatedTextInput } from '../../../ValidatedTextInput';
+import { ValidatedInput } from '../../../ValidatedInput';
 import { isAwsAccountIdValid } from '../../../validators';
 
 export type AwsShareMethod = 'manual' | 'sources';
@@ -123,7 +123,7 @@ const Aws = () => {
       {shareMethod === 'manual' && (
         <>
           <FormGroup label="AWS account ID" isRequired>
-            <ValidatedTextInput
+            <ValidatedInput
               ariaLabel="aws account id"
               value={shareWithAccount || ''}
               validator={isAwsAccountIdValid}

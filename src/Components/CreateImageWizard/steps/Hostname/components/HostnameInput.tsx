@@ -8,7 +8,7 @@ import {
   selectHostname,
 } from '../../../../../store/wizardSlice';
 import { useHostnameValidation } from '../../../utilities/useValidation';
-import { HookValidatedInput } from '../../../ValidatedTextInput';
+import { HookValidatedInput } from '../../../ValidatedInput';
 
 const HostnameInput = () => {
   const dispatch = useAppDispatch();

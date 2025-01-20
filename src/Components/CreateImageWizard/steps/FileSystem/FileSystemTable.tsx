@@ -33,7 +33,7 @@ import {
   selectPartitions,
 } from '../../../../store/wizardSlice';
 import { useFilesystemValidation } from '../../utilities/useValidation';
-import { HookValidatedInput } from '../../ValidatedTextInput';
+import { HookValidatedInput } from '../../ValidatedInput';
 
 export const FileSystemContext = React.createContext<boolean>(true);
 
