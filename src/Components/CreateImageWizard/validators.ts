@@ -57,6 +57,17 @@ export const isFileSystemConfigValid = (partitions: Partition[]) => {
   return duplicates.length === 0;
 };
 
+export const isUserNameValid = (userName: string) => {
+  if (userName === undefined) return false;
+  const isLengthValid = userName.length <= 32;
+  const isNotNumericOnly = !/^\d+$/.test(userName);
+  const isPatternValid = /^[a-zA-Z0-9][a-zA-Z0-9_.-]*[a-zA-Z0-9_$]$/.test(
+    userName
+  );
+
+  return isLengthValid && isNotNumericOnly && isPatternValid;
+};
+
 export const getDuplicateMountPoints = (partitions: Partition[]): string[] => {
   const mountPointSet: Set<string> = new Set();
   const duplicates: string[] = [];

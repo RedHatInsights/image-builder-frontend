@@ -1,11 +1,21 @@
 import React from 'react';
 
-import { Button, FormGroup } from '@patternfly/react-core';
-import { ExternalLinkAltIcon } from '@patternfly/react-icons';
+import {
+  Button,
+  EmptyState,
+  EmptyStateFooter,
+  EmptyStateVariant,
+  FormGroup,
+  Popover,
+  Text,
+  TextContent,
+} from '@patternfly/react-core';
+import { ExternalLinkAltIcon, HelpIcon } from '@patternfly/react-icons';
 
 import { GENERATING_SSH_KEY_PAIRS_URL } from '../../../../../constants';
 import { useAppDispatch, useAppSelector } from '../../../../../store/hooks';
 import {
+  removeUser,
   selectUserNameByIndex,
   selectUserPasswordByIndex,
   selectUserSshKeyByIndex,
@@ -13,6 +23,7 @@ import {
   setUserPasswordByIndex,
   setUserSshKeyByIndex,
 } from '../../../../../store/wizardSlice';
+import { useUsersValidation } from '../../../utilities/useValidation';
 import { HookValidatedInput } from '../../../ValidatedTextInput';
 const UserInfo = () => {
   const dispatch = useAppDispatch();
@@ -45,10 +56,11 @@ const UserInfo = () => {
     dispatch(setUserSshKeyByIndex({ index: index, sshKey: value }));
   };
 
-  const stepValidation = {
-    errors: {},
-    disabledNext: false,
+  const onRemoveUserClick = () => {
+    dispatch(removeUser());
   };
+
+  const stepValidation = useUsersValidation();
 
   return (
     <>
@@ -94,6 +106,34 @@ const UserInfo = () => {
           Learn more about SSH keys
         </Button>
       </FormGroup>
+      <EmptyState variant={EmptyStateVariant.lg}>
+        <EmptyStateFooter>
+          <Popover
+            hasAutoWidth
+            maxWidth="35rem"
+            bodyContent={
+              <TextContent>
+                <Text>
+                  If you regret and do not want to add a user it is totally
+                  fine, just click the button to remove it
+                </Text>
+              </TextContent>
+            }
+          >
+            <Button
+              variant="plain"
+              aria-label="Activation key popover"
+              aria-describedby="subscription-activation-key"
+              className="pf-v5-u-pl-sm pf-v5-u-pt-0 pf-v5-u-pb-0 pf-v5-u-pr-0"
+            >
+              <HelpIcon />
+            </Button>
+          </Popover>
+          <Button variant="secondary" onClick={onRemoveUserClick}>
+            Remove a user
+          </Button>
+        </EmptyStateFooter>
+      </EmptyState>
     </>
   );
 };

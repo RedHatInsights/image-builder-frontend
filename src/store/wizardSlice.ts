@@ -409,7 +409,7 @@ export const selectBlueprintDescription = (state: RootState) => {
 };
 
 export const selectFirstBootScript = (state: RootState) => {
-  return state.wizard.firstBoot?.script;
+  return state.wizard.firstBoot.script;
 };
 
 export const selectTimezone = (state: RootState) => {
@@ -836,6 +836,9 @@ export const wizardSlice = createSlice({
 
       state.users.push(newUser);
     },
+    removeUser: (state) => {
+      state.users.pop();
+    },
     setUserNameByIndex: (state, action: PayloadAction<UserPayload>) => {
       state.users[action.payload.index].name = action.payload.name;
     },
@@ -930,6 +933,7 @@ export const {
   addPort,
   removePort,
   addUser,
+  removeUser,
   setUserNameByIndex,
   setUserPasswordByIndex,
   setUserSshKeyByIndex,
