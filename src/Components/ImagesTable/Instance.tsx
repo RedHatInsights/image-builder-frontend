@@ -55,7 +55,7 @@ type CloudInstancePropTypes = {
 export const CloudInstance = ({ compose }: CloudInstancePropTypes) => {
   const { initialized: chromeInitialized } = useChrome();
   const scalprum = useScalprum();
-  const hasProvisioning = chromeInitialized && scalprum.config?.provisioning;
+  const hasProvisioning = chromeInitialized && scalprum.config.provisioning;
 
   const { data, isSuccess } = useGetComposeStatusQuery({
     composeId: compose.id,
@@ -114,7 +114,7 @@ const ProvisioningLink = ({
     { search: blueprintSearchInput },
     {
       selectFromResult: ({ data }) => ({
-        selectedBlueprintVersion: data?.data?.find(
+        selectedBlueprintVersion: data?.data.find(
           (blueprint: BlueprintItem) => blueprint.id === selectedBlueprintId
         )?.version,
       }),
@@ -128,7 +128,7 @@ const ProvisioningLink = ({
   ) {
     return <DisabledProvisioningLink />;
   } else {
-    const ProvisioningWizard = exposedScalprumModule?.default;
+    const ProvisioningWizard = exposedScalprumModule.default;
     const provider = getImageProvider(compose);
 
     const options = compose.request.image_requests[0].upload_request.options;
@@ -238,10 +238,6 @@ export const OciInstance = ({ compose, isExpired }: OciInstancePropTypes) => {
   const { data, isSuccess, isFetching, isError } = useGetComposeStatusQuery({
     composeId: compose.id,
   });
-
-  if (!isSuccess) {
-    return <Skeleton />;
-  }
 
   const options = data?.image_status.upload_status?.options;
 

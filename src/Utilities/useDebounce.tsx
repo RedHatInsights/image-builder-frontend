@@ -15,7 +15,7 @@ function useDebounce<T>(
     if (!isEqual(value, debouncedValue)) {
       const timer = setTimeout(
         () => setDebouncedValue(value),
-        value === '' ? 0 : delay !== undefined ? delay : 500 //If value is empty string, instantly return
+        value === '' ? 0 : delay //If value is empty string, instantly return
       );
 
       return () => {

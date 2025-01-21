@@ -82,7 +82,7 @@ const BlueprintsSidebar = () => {
   const dispatch = useAppDispatch();
   const blueprints = blueprintsData?.data;
 
-  const blueprintsTotal = blueprintsData?.meta?.count || 0;
+  const blueprintsTotal = blueprintsData?.meta.count || 0;
 
   if (isLoading) {
     return (

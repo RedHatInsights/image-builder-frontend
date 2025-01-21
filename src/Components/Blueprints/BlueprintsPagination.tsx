@@ -32,7 +32,7 @@ const BlueprintsPagination = () => {
   const { data: blueprintsData } = useGetBlueprintsQuery(searchParams);
   const dispatch = useAppDispatch();
 
-  const blueprintsTotal = blueprintsData?.meta?.count || 0;
+  const blueprintsTotal = blueprintsData?.meta.count || 0;
   const onSetPage: OnSetPage = (_, page) => {
     const direction = page > currPage ? 1 : -1; // Calculate offset based on direction of paging
     const nextOffset = blueprintsOffset + direction * blueprintsLimit;

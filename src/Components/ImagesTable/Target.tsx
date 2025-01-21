@@ -27,6 +27,6 @@ export const AwsTarget = ({ compose }: AwsTargetPropTypes) => {
     return <Skeleton />;
   }
 
-  const text = `${targetOptions.aws} (${data?.data?.length ?? 0 + 1})`;
+  const text = `${targetOptions.aws} (${data?.data.length ?? 0 + 1})`;
   return <>{text}</>;
 };

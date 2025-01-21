@@ -49,7 +49,7 @@ export const LandingPage = () => {
   }, [initialActiveTabKey]);
   const handleTabClick = (_event: React.MouseEvent, tabIndex: number) => {
     const tabPath = tabsPath[tabIndex];
-    if (tabPath !== undefined) {
+    if (tabPath !== '') {
       navigate(tabPath);
     }
     setActiveTabKey(tabIndex);

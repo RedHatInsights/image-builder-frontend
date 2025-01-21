@@ -63,7 +63,6 @@ export const BlueprintActionsMenu: React.FunctionComponent<
           variant="plain"
           aria-label="blueprint menu toggle"
           data-testid="blueprint-action-menu-toggle"
-          isDisabled={selectedBlueprintId === undefined}
         >
           <EllipsisVIcon aria-hidden="true" />
         </MenuToggle>

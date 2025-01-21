@@ -46,7 +46,7 @@ export const BuildImagesButton = ({ children }: BuildImagesButtonPropTypes) => {
           id: selectedBlueprintId,
           body: {
             image_types: blueprintImageType?.filter(
-              (target) => !deselectedTargets?.includes(target)
+              (target) => !deselectedTargets.includes(target)
             ),
           },
         });
@@ -78,7 +78,7 @@ export const BuildImagesButton = ({ children }: BuildImagesButtonPropTypes) => {
   ) => {
     const imageType = blueprintImageType?.[itemId];
 
-    if (imageType && deselectedTargets?.includes(imageType)) {
+    if (imageType && deselectedTargets.includes(imageType)) {
       setDeselectedTargets(
         deselectedTargets.filter((target) => target !== imageType)
       );
@@ -143,7 +143,8 @@ export const BuildImagesButton = ({ children }: BuildImagesButtonPropTypes) => {
                 hasCheckbox
                 itemId={index}
                 isSelected={
-                  !deselectedTargets || !deselectedTargets.includes(imageType)
+                  deselectedTargets.length === 0 ||
+                  !deselectedTargets.includes(imageType)
                 }
               >
                 {targetOptions[imageType]}

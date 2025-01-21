@@ -48,7 +48,7 @@ export const mockSourcesPackagesResults = (
       },
     ];
   }
-  if (search === 'mock' && isDistroPkgSearch) {
+  if (search === 'mock') {
     return [
       {
         package_name: 'mockPkg',

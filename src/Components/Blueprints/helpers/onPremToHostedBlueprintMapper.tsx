@@ -143,7 +143,7 @@ export const mapOnPremToHosted = (
       fips:
         blueprint.customizations?.fips !== undefined
           ? {
-              enabled: blueprint.customizations?.fips,
+              enabled: blueprint.customizations.fips,
             }
           : undefined,
       timezone:

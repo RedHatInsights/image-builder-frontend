@@ -84,7 +84,7 @@ export const AwsDetailsStatus = ({ compose }: ComposeStatusPropTypes) => {
         <ErrorStatus
           icon={statuses[data.image_status.status].icon}
           text={statuses[data.image_status.status].text}
-          error={data?.image_status?.error || ''}
+          error={data.image_status.error || ''}
         />
       );
     default:

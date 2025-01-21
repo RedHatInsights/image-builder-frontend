@@ -103,7 +103,7 @@ const ImagesTable = () => {
     searchParamsGetBlueprints,
     {
       selectFromResult: ({ data }) => ({
-        selectedBlueprintVersion: data?.data?.find(
+        selectedBlueprintVersion: data?.data.find(
           (blueprint: BlueprintItem) => blueprint.id === selectedBlueprintId
         )?.version,
       }),

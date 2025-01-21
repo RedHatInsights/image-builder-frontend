@@ -48,7 +48,7 @@ export const DeleteBlueprintModal: React.FunctionComponent<
 
   const { blueprintName } = useGetBlueprintsQuery(searchParams, {
     selectFromResult: ({ data }) => ({
-      blueprintName: data?.data?.find(
+      blueprintName: data?.data.find(
         (blueprint: { id: string | undefined }) =>
           blueprint.id === selectedBlueprintId
       )?.name,
