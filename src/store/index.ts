@@ -33,6 +33,10 @@ export const serviceReducer = combineReducers({
 });
 
 export const onPremReducer = combineReducers({
+  [contentSourcesApi.reducerPath]: contentSourcesApi.reducer,
+  [rhsmApi.reducerPath]: rhsmApi.reducer,
+  [provisioningApi.reducerPath]: provisioningApi.reducer,
+  [complianceApi.reducerPath]: complianceApi.reducer,
   [cockpitApi.reducerPath]: cockpitApi.reducer,
   // TODO: add other endpoints so we can remove this.
   // It's still needed to get things to work.
@@ -125,6 +129,10 @@ export const onPremMiddleware = (getDefaultMiddleware: Function) =>
     promiseMiddleware,
     // TODO: add other endpoints so we can remove this.
     // It's still needed to get things to work.
+    contentSourcesApi.middleware,
+    rhsmApi.middleware,
+    provisioningApi.middleware,
+    complianceApi.middleware,
     imageBuilderApi.middleware,
     cockpitApi.middleware
   );

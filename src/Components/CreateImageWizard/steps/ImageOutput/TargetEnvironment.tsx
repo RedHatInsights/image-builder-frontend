@@ -12,13 +12,14 @@ import {
   Tile,
 } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
-import { useFlag } from '@unleash/proxy-client-react';
 
+import awsIcon from '../../../../assets/aws.svg';
+import gcpIcon from '../../../../assets/google-cloud-short.svg';
+import azureIcon from '../../../../assets/microsoft-azure-short.svg';
+import oracleIcon from '../../../../assets/oracle-short.svg';
+import { useGetArchitecturesQuery } from '../../../../store/backendApi';
 import { useAppSelector, useAppDispatch } from '../../../../store/hooks';
-import {
-  ImageTypes,
-  useGetArchitecturesQuery,
-} from '../../../../store/imageBuilderApi';
+import { ImageTypes } from '../../../../store/imageBuilderApi';
 import { provisioningApi } from '../../../../store/provisioningApi';
 import { rhsmApi } from '../../../../store/rhsmApi';
 import {
@@ -31,6 +32,7 @@ import {
   selectDistribution,
   selectImageTypes,
 } from '../../../../store/wizardSlice';
+import { useFlag } from '../../../../Utilities/useGetEnvironment';
 
 const TargetEnvironment = () => {
   const arch = useAppSelector(selectArchitecture);
@@ -104,7 +106,11 @@ const TargetEnvironment = () => {
               icon={
                 <img
                   className="provider-icon"
-                  src={'/apps/frontend-assets/partners-icons/aws.svg'}
+                  src={
+                    process.env.IS_ON_PREMISE
+                      ? awsIcon
+                      : '/apps/frontend-assets/partners-icons/aws.svg'
+                  }
                   alt="Amazon Web Services logo"
                 />
               }
@@ -127,7 +133,9 @@ const TargetEnvironment = () => {
                 <img
                   className="provider-icon"
                   src={
-                    '/apps/frontend-assets/partners-icons/google-cloud-short.svg'
+                    process.env.IS_ON_PREMISE
+                      ? gcpIcon
+                      : '/apps/frontend-assets/partners-icons/google-cloud-short.svg'
                   }
                   alt="Google Cloud Platform logo"
                 />
@@ -151,7 +159,9 @@ const TargetEnvironment = () => {
                 <img
                   className="provider-icon"
                   src={
-                    '/apps/frontend-assets/partners-icons/microsoft-azure-short.svg'
+                    process.env.IS_ON_PREMISE
+                      ? azureIcon
+                      : '/apps/frontend-assets/partners-icons/microsoft-azure-short.svg'
                   }
                   alt="Microsoft Azure logo"
                 />
@@ -174,7 +184,11 @@ const TargetEnvironment = () => {
               icon={
                 <img
                   className="provider-icon"
-                  src={'/apps/frontend-assets/partners-icons/oracle-short.svg'}
+                  src={
+                    process.env.IS_ON_PREMISE
+                      ? oracleIcon
+                      : '/apps/frontend-assets/partners-icons/oracle-short.svg'
+                  }
                   alt="Oracle Cloud Infrastructure logo"
                 />
               }

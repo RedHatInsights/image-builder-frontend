@@ -27,6 +27,9 @@ module.exports = {
   mode,
   devtool,
   plugins,
+  devServer: {
+    historyApiFallback: true, // Ensures all routes are served with `index.html`
+  },
   resolve: {
     fallback: {
       path: require.resolve('path-browserify'),
@@ -73,6 +76,10 @@ module.exports = {
       {
         test: /\.scss$/,
         use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg)$/i,
+        type: 'asset/resource', // Handles image files
       },
     ],
   },

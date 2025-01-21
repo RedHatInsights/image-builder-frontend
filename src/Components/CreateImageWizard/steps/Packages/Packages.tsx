@@ -49,6 +49,7 @@ import {
   EPEL_9_REPO_DEFINITION,
   RH_ICON_SIZE,
 } from '../../../../constants';
+import { useGetArchitecturesQuery } from '../../../../store/backendApi';
 import {
   ApiRepositoryResponseRead,
   useCreateRepositoryMutation,
@@ -57,10 +58,7 @@ import {
   useSearchPackageGroupMutation,
 } from '../../../../store/contentSourcesApi';
 import { useAppSelector } from '../../../../store/hooks';
-import {
-  Package,
-  useGetArchitecturesQuery,
-} from '../../../../store/imageBuilderApi';
+import { Package } from '../../../../store/imageBuilderApi';
 import {
   selectArchitecture,
   selectPackages,

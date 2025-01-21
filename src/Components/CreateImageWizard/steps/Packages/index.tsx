@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { Alert, Text, Form, Title } from '@patternfly/react-core';
-import { useFlag } from '@unleash/proxy-client-react';
 
 import PackageRecommendations from './PackageRecommendations';
 import Packages from './Packages';
@@ -9,6 +8,7 @@ import Packages from './Packages';
 import { RHEL_8, RHEL_9 } from '../../../../constants';
 import { useAppSelector } from '../../../../store/hooks';
 import { selectDistribution } from '../../../../store/wizardSlice';
+import { useFlag } from '../../../../Utilities/useGetEnvironment';
 
 const PackagesStep = () => {
   const packageRecommendationsFlag = useFlag('image-builder.pkgrecs.enabled');

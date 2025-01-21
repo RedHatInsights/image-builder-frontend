@@ -19,6 +19,11 @@ import {
   DeleteBlueprintApiResponse,
   DeleteBlueprintApiArg,
   BlueprintItem,
+  GetOscapProfilesApiArg,
+  GetOscapProfilesApiResponse,
+  GetBlueprintApiResponse,
+  GetBlueprintApiArg,
+  Distributions,
 } from './imageBuilderApi';
 
 import { mapOnPremToHosted } from '../Components/Blueprints/helpers/onPremToHostedBlueprintMapper';
@@ -32,6 +37,37 @@ const getBlueprintsPath = async () => {
   return `${user.home}/${BLUEPRINTS_DIR}`;
 };
 
+// TODO: this is by no means complete (or completely correct).
+// This is just an attempt to get some results. We will need to
+// be able to translate these back again in the future when we
+// are making image-requests. This may need to be extracted out
+// of this file into a general helper
+const translateImageTypes = (imageType: string) => {
+  switch (imageType) {
+    case 'ami':
+      return 'aws';
+    case 'azure-rhui':
+      return 'azure';
+    case 'azure-sap-rhui':
+      return 'azure';
+    case 'ec2':
+      return 'aws';
+    case 'gce':
+      return 'gcp';
+    case 'qcow2':
+      return 'guest-image';
+    default:
+      return imageType;
+  }
+};
+
+type ArchitecturesRawResponse = Partial<
+  Record<
+    keyof Distributions,
+    Record<string, { name: string; baseurls: string[]; gpgkeys: string[] }>
+  >
+>;
+
 export const cockpitApi = emptyCockpitApi.injectEndpoints({
   endpoints: (builder) => {
     return {
@@ -39,9 +75,67 @@ export const cockpitApi = emptyCockpitApi.injectEndpoints({
         GetArchitecturesApiResponse,
         GetArchitecturesApiArg
       >({
-        query: (queryArg) => ({
-          url: `/architectures/${queryArg.distribution}`,
+        query: () => ({
+          url: '/distributions',
+          body: '',
+          method: 'GET',
         }),
+        transformResponse: (
+          response: ArchitecturesRawResponse,
+          _,
+          { distribution }: { distribution: string }
+        ) => {
+          const distroArches = response[distribution as keyof Distributions];
+          if (!distroArches) {
+            return [];
+          }
+
+          return Object.keys(distroArches)
+            .map((arch) => {
+              const imageTypes = Object.keys(distroArches[arch]).map(
+                translateImageTypes
+              );
+              return {
+                arch,
+                image_types: imageTypes,
+                // TODO: we need to get a Set of repositories here
+                // the endpoint returns repositories for each image
+                // type
+                repositories: [],
+              };
+            })
+            .filter((result) => {
+              return result.arch === 'aarch64' || result.arch === 'x86_64';
+            });
+        },
+      }),
+      getBlueprint: builder.query<GetBlueprintApiResponse, GetBlueprintApiArg>({
+        queryFn: async ({ id, version }) => {
+          try {
+            const blueprintsDir = await getBlueprintsPath();
+            const file = cockpit.file(path.join(blueprintsDir, id));
+
+            const contents = await file.read();
+            const parsed = toml.parse(contents);
+            file.close();
+
+            const blueprint = mapOnPremToHosted(parsed);
+
+            return {
+              data: {
+                ...blueprint,
+                id,
+                version,
+                last_modified_at: Date.now().toString(),
+                // TODO: get image requests. Will probably need
+                // to query cloudapi on composer socket.
+                image_requests: [],
+              },
+            };
+          } catch (error) {
+            return { error };
+          }
+        },
       }),
       getBlueprints: builder.query<
         GetBlueprintsApiResponse,
@@ -143,12 +237,28 @@ export const cockpitApi = emptyCockpitApi.injectEndpoints({
           }
         },
       }),
+      getOscapProfiles: builder.query<
+        GetOscapProfilesApiResponse,
+        GetOscapProfilesApiArg
+      >({
+        queryFn: async () => {
+          // TODO: make a call to get the openscap profiles
+          // For now, just return an empty list so we can
+          // step through the wizard.
+          return {
+            data: [],
+          };
+        },
+      }),
     };
   },
 });
 
 export const {
-  useGetBlueprintsQuery,
-  useDeleteBlueprintMutation,
   useGetArchitecturesQuery,
+  useGetBlueprintQuery,
+  useGetBlueprintsQuery,
+  useLazyGetBlueprintsQuery,
+  useDeleteBlueprintMutation,
+  useGetOscapProfilesQuery,
 } = cockpitApi;

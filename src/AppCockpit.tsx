@@ -6,7 +6,7 @@ import React from 'react';
 import NotificationsPortal from '@redhat-cloud-services/frontend-components-notifications/NotificationPortal';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import { BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 
 import { Router } from './Router';
 import { onPremStore as store } from './store';
@@ -15,9 +15,9 @@ const Application = () => {
   return (
     <React.Fragment>
       <NotificationsPortal />
-      <BrowserRouter>
+      <HashRouter>
         <Router />
-      </BrowserRouter>
+      </HashRouter>
     </React.Fragment>
   );
 };
