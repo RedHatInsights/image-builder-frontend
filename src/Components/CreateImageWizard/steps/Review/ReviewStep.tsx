@@ -46,6 +46,11 @@ import {
   selectDistribution,
   selectImageTypes,
   selectRegistrationType,
+  selectHostname,
+  selectLanguages,
+  selectKeyboard,
+  selectTimezone,
+  selectNtpServers,
 } from '../../../../store/wizardSlice';
 import { useFlag } from '../../../../Utilities/useGetEnvironment';
 
@@ -60,6 +65,11 @@ const Review = ({ snapshottingEnabled }: { snapshottingEnabled: boolean }) => {
   const complianceProfile = useAppSelector(selectComplianceProfileID);
   const compliancePolicy = useAppSelector(selectCompliancePolicyID);
   const registrationType = useAppSelector(selectRegistrationType);
+  const hostname = useAppSelector(selectHostname);
+  const languages = useAppSelector(selectLanguages);
+  const keyboard = useAppSelector(selectKeyboard);
+  const timezone = useAppSelector(selectTimezone);
+  const ntpServers = useAppSelector(selectNtpServers);
 
   const [isExpandedImageOutput, setIsExpandedImageOutput] = useState(true);
   const [isExpandedTargetEnvs, setIsExpandedTargetEnvs] = useState(true);
@@ -334,41 +344,44 @@ const Review = ({ snapshottingEnabled }: { snapshottingEnabled: boolean }) => {
           <UsersList />
         </ExpandableSection>
       )}
-      {isTimezoneEnabled && (
-        <ExpandableSection
-          toggleContent={composeExpandable(
-            'Timezone',
-            'revisit-timezone',
-            'wizard-timezone'
-          )}
-          onToggle={(_event, isExpandedTimezone) =>
-            onToggleTimezone(isExpandedTimezone)
-          }
-          isExpanded={isExpandedTimezone}
-          isIndented
-          data-testid="timezone-expandable"
-        >
-          <TimezoneList />
-        </ExpandableSection>
-      )}
-      {isLocaleEnabled && (
-        <ExpandableSection
-          toggleContent={composeExpandable(
-            'Locale',
-            'revisit-locale',
-            'wizard-locale'
-          )}
-          onToggle={(_event, isExpandedLocale) =>
-            onToggleLocale(isExpandedLocale)
-          }
-          isExpanded={isExpandedLocale}
-          isIndented
-          data-testid="locale-expandable"
-        >
-          <LocaleList />
-        </ExpandableSection>
-      )}
-      {isHostnameEnabled && (
+      {isTimezoneEnabled &&
+        (timezone || (ntpServers && ntpServers.length > 0)) && (
+          <ExpandableSection
+            toggleContent={composeExpandable(
+              'Timezone',
+              'revisit-timezone',
+              'wizard-timezone'
+            )}
+            onToggle={(_event, isExpandedTimezone) =>
+              onToggleTimezone(isExpandedTimezone)
+            }
+            isExpanded={isExpandedTimezone}
+            isIndented
+            data-testid="timezone-expandable"
+          >
+            <TimezoneList />
+          </ExpandableSection>
+        )}
+      {isLocaleEnabled &&
+        ((languages && languages.length > 0) ||
+          (keyboard && keyboard.length > 0)) && (
+          <ExpandableSection
+            toggleContent={composeExpandable(
+              'Locale',
+              'revisit-locale',
+              'wizard-locale'
+            )}
+            onToggle={(_event, isExpandedLocale) =>
+              onToggleLocale(isExpandedLocale)
+            }
+            isExpanded={isExpandedLocale}
+            isIndented
+            data-testid="locale-expandable"
+          >
+            <LocaleList />
+          </ExpandableSection>
+        )}
+      {isHostnameEnabled && hostname && (
         <ExpandableSection
           toggleContent={composeExpandable(
             'Hostname',

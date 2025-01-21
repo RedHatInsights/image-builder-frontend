@@ -125,6 +125,7 @@ describe('Step Timezone', () => {
   test('revisit step button on Review works', async () => {
     await renderCreateMode();
     await goToTimezoneStep();
+    await selectTimezone();
     await goToReviewStep();
     await clickRevisitButton();
     await screen.findByRole('heading', { name: /Timezone/ });
