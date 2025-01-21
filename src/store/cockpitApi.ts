@@ -19,6 +19,10 @@ import {
   DeleteBlueprintApiResponse,
   DeleteBlueprintApiArg,
   BlueprintItem,
+  GetOscapProfilesApiArg,
+  GetOscapProfilesApiResponse,
+  GetBlueprintApiResponse,
+  GetBlueprintApiArg,
 } from './imageBuilderApi';
 
 import { mapOnPremToHosted } from '../Components/Blueprints/helpers/onPremToHostedBlueprintMapper';
@@ -39,9 +43,86 @@ export const cockpitApi = emptyCockpitApi.injectEndpoints({
         GetArchitecturesApiResponse,
         GetArchitecturesApiArg
       >({
-        query: (queryArg) => ({
-          url: `/architectures/${queryArg.distribution}`,
-        }),
+        queryFn: () => {
+          // TODO: this is hardcoded for now, but we may need to query
+          // the cloudapi endpoint on the composer socket to get the
+          // available information
+          return {
+            data: [
+              {
+                arch: 'aarch64',
+                image_types: ['aws', 'guest-image', 'image-installer'],
+                repositories: [
+                  {
+                    baseurl:
+                      'https://cdn.redhat.com/content/dist/rhel9/9/aarch64/baseos/os',
+                    rhsm: true,
+                  },
+                  {
+                    baseurl:
+                      'https://cdn.redhat.com/content/dist/rhel9/9/aarch64/appstream/os',
+                    rhsm: true,
+                  },
+                ],
+              },
+              {
+                arch: 'x86_64',
+                image_types: [
+                  'aws',
+                  'gcp',
+                  'azure',
+                  'rhel-edge-commit',
+                  'rhel-edge-installer',
+                  'edge-commit',
+                  'edge-installer',
+                  'guest-image',
+                  'image-installer',
+                  'vsphere',
+                ],
+                repositories: [
+                  {
+                    baseurl:
+                      'https://cdn.redhat.com/content/dist/rhel9/9.0/x86_64/baseos/os',
+                    rhsm: true,
+                  },
+                  {
+                    baseurl:
+                      'https://cdn.redhat.com/content/dist/rhel9/9.0/x86_64/appstream/os',
+                    rhsm: true,
+                  },
+                ],
+              },
+            ],
+          };
+        },
+      }),
+      getBlueprint: builder.query<GetBlueprintApiResponse, GetBlueprintApiArg>({
+        queryFn: async ({ id, version }) => {
+          try {
+            const blueprintsDir = await getBlueprintsPath();
+            const file = cockpit.file(path.join(blueprintsDir, id));
+
+            const contents = await file.read();
+            const parsed = toml.parse(contents);
+            file.close();
+
+            const blueprint = mapOnPremToHosted(parsed);
+
+            return {
+              data: {
+                ...blueprint,
+                id,
+                version,
+                last_modified_at: Date.now().toString(),
+                // TODO: get image requests. Will probably need
+                // to query cloudapi on composer socket.
+                image_requests: [],
+              },
+            };
+          } catch (error) {
+            return { error };
+          }
+        },
       }),
       getBlueprints: builder.query<
         GetBlueprintsApiResponse,
@@ -143,12 +224,28 @@ export const cockpitApi = emptyCockpitApi.injectEndpoints({
           }
         },
       }),
+      getOscapProfiles: builder.query<
+        GetOscapProfilesApiResponse,
+        GetOscapProfilesApiArg
+      >({
+        queryFn: async () => {
+          // TODO: make a call to get the openscap profiles
+          // For now, just return an empty list so we can
+          // step through the wizard.
+          return {
+            data: [],
+          };
+        },
+      }),
     };
   },
 });
 
 export const {
-  useGetBlueprintsQuery,
-  useDeleteBlueprintMutation,
   useGetArchitecturesQuery,
+  useGetBlueprintQuery,
+  useGetBlueprintsQuery,
+  useLazyGetBlueprintsQuery,
+  useDeleteBlueprintMutation,
+  useGetOscapProfilesQuery,
 } = cockpitApi;

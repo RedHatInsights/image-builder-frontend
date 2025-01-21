@@ -5,9 +5,9 @@ import { Button, Modal, ModalVariant } from '@patternfly/react-core';
 
 import { BuildImagesButton } from './BuildImagesButton';
 
+import { useGetBlueprintQuery } from '../../store/backendApi';
 import { selectSelectedBlueprintId } from '../../store/BlueprintSlice';
 import { useAppSelector } from '../../store/hooks';
-import { useGetBlueprintQuery } from '../../store/imageBuilderApi';
 
 type blueprintDiffProps = {
   // baseVersion is the version of the blueprint to compare the latest version against

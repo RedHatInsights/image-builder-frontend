@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react';
 
 import { UNIQUE_VALIDATION_DELAY } from '../../../constants';
+import { useLazyGetBlueprintsQuery } from '../../../store/backendApi';
 import { useAppSelector } from '../../../store/hooks';
-import {
-  BlueprintsResponse,
-  useLazyGetBlueprintsQuery,
-} from '../../../store/imageBuilderApi';
+import { BlueprintsResponse } from '../../../store/imageBuilderApi';
 import { useShowActivationKeyQuery } from '../../../store/rhsmApi';
 import {
   selectBlueprintId,

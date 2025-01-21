@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import CreateImageWizard from './CreateImageWizard';
 import { mapRequestToState } from './utilities/requestMapper';
 
+import { useGetBlueprintQuery } from '../../store/backendApi';
 import { useAppDispatch } from '../../store/hooks';
-import { useGetBlueprintQuery } from '../../store/imageBuilderApi';
 import { loadWizardState } from '../../store/wizardSlice';
 import { resolveRelPath } from '../../Utilities/path';
 

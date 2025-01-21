@@ -19,12 +19,12 @@ import { addNotification } from '@redhat-cloud-services/frontend-components-noti
 import { skipToken } from '@reduxjs/toolkit/query';
 
 import { targetOptions } from '../../constants';
+import { useGetBlueprintQuery } from '../../store/backendApi';
 import { selectSelectedBlueprintId } from '../../store/BlueprintSlice';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
   ImageTypes,
   useComposeBlueprintMutation,
-  useGetBlueprintQuery,
 } from '../../store/imageBuilderApi';
 
 type BuildImagesButtonPropTypes = {

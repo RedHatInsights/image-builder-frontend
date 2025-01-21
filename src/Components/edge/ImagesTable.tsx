@@ -3,7 +3,6 @@ import React from 'react';
 import AsyncComponent from '@redhat-cloud-services/frontend-components/AsyncComponent';
 import ErrorState from '@redhat-cloud-services/frontend-components/ErrorState';
 import Unavailable from '@redhat-cloud-services/frontend-components/Unavailable';
-import { useFlag } from '@unleash/proxy-client-react';
 import { useDispatch } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -13,6 +12,7 @@ import {
   manageEdgeImagesUrlName,
 } from '../../Utilities/edge';
 import { resolveRelPath } from '../../Utilities/path';
+import { useFlag } from '../../Utilities/useGetEnvironment';
 
 const ImagesTable = () => {
   const dispatch = useDispatch();

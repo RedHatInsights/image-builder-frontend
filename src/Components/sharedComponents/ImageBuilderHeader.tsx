@@ -24,8 +24,8 @@ import {
   CREATING_IMAGES_WITH_IB_SERVICE_URL,
   OSBUILD_SERVICE_ARCHITECTURE_URL,
 } from '../../constants';
+import { useBackendPrefetch } from '../../store/backendApi';
 import { useAppSelector } from '../../store/hooks';
-import { imageBuilderApi } from '../../store/imageBuilderApi';
 import { selectDistribution } from '../../store/wizardSlice';
 import { resolveRelPath } from '../../Utilities/path';
 import './ImageBuilderHeader.scss';
@@ -99,7 +99,7 @@ export const ImageBuilderHeader = ({
   const navigate = useNavigate();
 
   const distribution = useAppSelector(selectDistribution);
-  const prefetchTargets = imageBuilderApi.usePrefetch('getArchitectures');
+  const prefetchTargets = useBackendPrefetch('getArchitectures');
 
   const importExportFlag = useFlagWithEphemDefault(
     'image-builder.import.enabled'
