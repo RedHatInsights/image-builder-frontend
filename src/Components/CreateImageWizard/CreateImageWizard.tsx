@@ -41,6 +41,7 @@ import {
   useRegistrationValidation,
   useHostnameValidation,
   useKernelValidation,
+  useUsersValidation,
 } from './utilities/useValidation';
 import {
   isAwsAccountIdValid,
@@ -160,8 +161,8 @@ const CreateImageWizard = ({ isEdit }: CreateImageWizardProps) => {
       !isError &&
       !isFetching &&
       isSuccess &&
-      data?.snapshots?.accessible === false &&
-      data?.snapshots?.enabled === false
+      data?.snapshots.accessible === false &&
+      data.snapshots.enabled === false
     );
   }, [data, isSuccess, isFetching, isError, snapshotsFlag]);
 
@@ -230,6 +231,8 @@ const CreateImageWizard = ({ isEdit }: CreateImageWizardProps) => {
   const firstBootValidation = useFirstBootValidation();
   // Details
   const detailsValidation = useDetailsValidation();
+  // Users
+  const usersValidation = useUsersValidation();
 
   let startIndex = 1; // default index
   if (isEdit) {
@@ -251,15 +254,14 @@ const CreateImageWizard = ({ isEdit }: CreateImageWizardProps) => {
 
     // Only this code is different from the original
     const status =
-      (step.isVisited && step.id !== activeStep?.id && step.status) ||
-      'default';
+      (step.isVisited && step.id !== activeStep.id && step.status) || 'default';
 
     return (
       <WizardNavItem
         key={step.id}
         id={step.id}
         content={step.name}
-        isCurrent={activeStep?.id === step.id}
+        isCurrent={activeStep.id === step.id}
         isDisabled={
           step.isDisabled ||
           (isVisitRequired && !step.isVisited && !hasVisitedNextStep)
@@ -462,7 +464,10 @@ const CreateImageWizard = ({ isEdit }: CreateImageWizardProps) => {
                 key="wizard-users"
                 isHidden={!isUsersEnabled}
                 footer={
-                  <CustomWizardFooter disableNext={false} optional={true} />
+                  <CustomWizardFooter
+                    disableNext={usersValidation.disabledNext}
+                    optional={true}
+                  />
                 }
               >
                 <UsersStep />

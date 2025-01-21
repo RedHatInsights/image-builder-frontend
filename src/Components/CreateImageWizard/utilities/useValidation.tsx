@@ -20,6 +20,10 @@ import {
   selectRegistrationType,
   selectHostname,
   selectKernel,
+  selectUserNameByIndex,
+  selectUsers,
+  selectUserPasswordByIndex,
+  selectUserSshKeyByIndex,
 } from '../../../store/wizardSlice';
 import {
   getDuplicateMountPoints,
@@ -29,6 +33,7 @@ import {
   isSnapshotValid,
   isHostnameValid,
   isKernelNameValid,
+  isUserNameValid,
 } from '../validators';
 
 export type StepValidation = {
@@ -173,6 +178,31 @@ export function useKernelValidation(): StepValidation {
   return { errors: {}, disabledNext: false };
 }
 
+export function useUsersValidation(): StepValidation {
+  const index = 0;
+  const userNameSelector = selectUserNameByIndex(index);
+  const userName = useAppSelector(userNameSelector);
+  const userPasswordSelector = selectUserPasswordByIndex(index);
+  const userPassword = useAppSelector(userPasswordSelector);
+  const userSshKeySelector = selectUserSshKeyByIndex(index);
+  const userSshKey = useAppSelector(userSshKeySelector);
+  const users = useAppSelector(selectUsers);
+  const canProceed =
+    // Case 1: there is no users
+    users.length === 0 ||
+    // Case 2: All fields are empty
+    (userName === '' && userPassword === '' && userSshKey === '') ||
+    // Case 3: userName is valid
+    (userName && isUserNameValid(userName));
+
+  return {
+    errors: {
+      userName: !isUserNameValid(userName) ? 'Invalid user name' : '',
+    },
+    disabledNext: !canProceed,
+  };
+}
+
 export function useDetailsValidation(): StepValidation {
   const name = useAppSelector(selectBlueprintName);
   const description = useAppSelector(selectBlueprintDescription);
@@ -194,7 +224,7 @@ export function useDetailsValidation(): StepValidation {
             .unwrap()
             .then((response: BlueprintsResponse) => {
               if (
-                response?.meta?.count > 0 &&
+                response.meta.count > 0 &&
                 response.data[0].id !== blueprintId
               ) {
                 setUniqueName(false);
