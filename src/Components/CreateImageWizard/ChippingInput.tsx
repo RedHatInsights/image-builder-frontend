@@ -44,31 +44,39 @@ const ChippingInput = ({
     value: string
   ) => {
     setInputValue(value);
+    setErrorText('');
+  };
+
+  const addItem = (value: string) => {
+    if (validator(value) && !list?.includes(value)) {
+      dispatch(addAction(value));
+      setInputValue('');
+      setErrorText('');
+    }
+
+    if (list?.includes(value)) {
+      setErrorText(`${item} already exists.`);
+    }
+
+    if (!validator(value)) {
+      setErrorText('Invalid format.');
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent, value: string) => {
     if (e.key === ' ' || e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
-
-      if (validator(value) && !list?.includes(value)) {
-        dispatch(addAction(value));
-        setInputValue('');
-        setErrorText('');
-      }
-
-      if (list?.includes(value)) {
-        setErrorText(`${item} already exists.`);
-      }
-
-      if (!validator(value)) {
-        setErrorText('Invalid format.');
-      }
+      addItem(value);
     }
   };
 
   const handleAddItem = (e: React.MouseEvent, value: string) => {
-    dispatch(addAction(value));
+    addItem(value);
+  };
+
+  const handleClear = () => {
     setInputValue('');
+    setErrorText('');
   };
 
   return (
@@ -91,7 +99,7 @@ const ChippingInput = ({
           </Button>
           <Button
             variant="plain"
-            onClick={() => setInputValue('')}
+            onClick={handleClear}
             isDisabled={!inputValue}
             aria-label="Clear input"
           >

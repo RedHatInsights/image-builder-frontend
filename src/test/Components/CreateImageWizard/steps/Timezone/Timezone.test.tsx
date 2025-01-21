@@ -58,12 +58,32 @@ const selectTimezone = async () => {
   await waitFor(() => user.click(amsterdamTimezone));
 };
 
-const addNtpServer = async (ntpServer: string) => {
+const addNtpServerViaKeyDown = async (ntpServer: string) => {
   const user = userEvent.setup();
   const ntpServersInput = await screen.findByPlaceholderText(
     /add ntp servers/i
   );
   await waitFor(() => user.type(ntpServersInput, ntpServer.concat(',')));
+};
+
+const addNtpServerViaAddButton = async (ntpServer: string) => {
+  const user = userEvent.setup();
+  const ntpServersInput = await screen.findByPlaceholderText(
+    /add ntp servers/i
+  );
+  const addServerBtn = await screen.findByRole('button', {
+    name: /add ntp server/i,
+  });
+  await waitFor(() => user.type(ntpServersInput, ntpServer));
+  await waitFor(() => user.click(addServerBtn));
+};
+
+const clearInput = async () => {
+  const user = userEvent.setup();
+  const clearInputBtn = await screen.findByRole('button', {
+    name: /clear input/i,
+  });
+  await waitFor(() => user.click(clearInputBtn));
 };
 
 const clickRevisitButton = async () => {
@@ -109,8 +129,14 @@ describe('Step Timezone', () => {
     expect(
       screen.queryByText('NTP server already exists.')
     ).not.toBeInTheDocument();
-    await addNtpServer('0.nl.pool.ntp.org');
-    await addNtpServer('0.nl.pool.ntp.org');
+    await addNtpServerViaKeyDown('0.nl.pool.ntp.org');
+    await addNtpServerViaKeyDown('0.nl.pool.ntp.org');
+    await screen.findByText('NTP server already exists.');
+    await clearInput();
+    expect(
+      screen.queryByText('NTP server already exists.')
+    ).not.toBeInTheDocument();
+    await addNtpServerViaAddButton('0.nl.pool.ntp.org');
     await screen.findByText('NTP server already exists.');
   });
 
@@ -118,7 +144,7 @@ describe('Step Timezone', () => {
     await renderCreateMode();
     await goToTimezoneStep();
     expect(screen.queryByText('Invalid format.')).not.toBeInTheDocument();
-    await addNtpServer('this is not NTP server');
+    await addNtpServerViaKeyDown('this is not NTP server');
     await screen.findByText('Invalid format.');
   });
 
@@ -159,8 +185,8 @@ describe('Timezone request generated correctly', () => {
   test('with NTP servers', async () => {
     await renderCreateMode();
     await goToTimezoneStep();
-    await addNtpServer('0.nl.pool.ntp.org');
-    await addNtpServer('1.nl.pool.ntp.org');
+    await addNtpServerViaKeyDown('0.nl.pool.ntp.org');
+    await addNtpServerViaKeyDown('1.nl.pool.ntp.org');
     await goToReviewStep();
     const receivedRequest = await interceptBlueprintRequest(CREATE_BLUEPRINT);
 
@@ -182,8 +208,8 @@ describe('Timezone request generated correctly', () => {
     await renderCreateMode();
     await goToTimezoneStep();
     await selectTimezone();
-    await addNtpServer('0.nl.pool.ntp.org');
-    await addNtpServer('1.nl.pool.ntp.org');
+    await addNtpServerViaKeyDown('0.nl.pool.ntp.org');
+    await addNtpServerViaKeyDown('1.nl.pool.ntp.org');
     await goToReviewStep();
     const receivedRequest = await interceptBlueprintRequest(CREATE_BLUEPRINT);
 
