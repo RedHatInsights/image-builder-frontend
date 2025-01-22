@@ -1,3 +1,4 @@
+import { ContentOrigin } from '../../../../../constants';
 import { ApiRepositoryResponseRead } from '../../../../../store/contentSourcesApi';
 import {
   CustomRepository,
@@ -11,7 +12,7 @@ export const convertSchemaToIBCustomRepo = (
   const imageBuilderRepo: CustomRepository = {
     id: repo.uuid!,
     name: repo.name,
-    baseurl: [repo.url!],
+    baseurl: repo.origin === ContentOrigin.UPLOAD ? undefined : [repo.url!],
     check_gpg: false,
   };
   // only include the flag if enabled
@@ -32,7 +33,8 @@ export const convertSchemaToIBPayloadRepo = (
   repo: ApiRepositoryResponseRead
 ) => {
   const imageBuilderRepo: Repository = {
-    baseurl: repo.url,
+    id: repo.uuid!,
+    baseurl: repo.origin === ContentOrigin.UPLOAD ? undefined : repo.url!,
     rhsm: false,
     check_gpg: false,
   };

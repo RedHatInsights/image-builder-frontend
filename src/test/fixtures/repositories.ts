@@ -108,7 +108,7 @@ const testingRepos: ApiRepositoryResponseRead[] = [
     snapshot: true,
   },
   {
-    uuid: 'ae39f556-6986-478a-95d1-f9c7e33d066c',
+    uuid: 'b77cc1a0-91ec-4d64-bb6d-21717737ea3c',
     name: '02-test-invalid-repo',
     url: 'http://invalid.link.to.repo.org/x86_64/',
     distribution_versions: ['9'],

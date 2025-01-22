@@ -254,13 +254,8 @@ const Packages = () => {
         searchCustomRpms({
           apiContentUnitSearchRequest: {
             search: debouncedSearchTerm,
-            urls: customRepositories.flatMap((repo) => {
-              if (!repo.baseurl) {
-                throw new Error(
-                  `Repository (id: ${repo.id}, name: ${repo?.name}) is missing baseurl`
-                );
-              }
-              return repo.baseurl;
+            uuids: customRepositories.flatMap((repo) => {
+              return repo.id;
             }),
           },
         });
@@ -315,13 +310,8 @@ const Packages = () => {
       searchCustomGroups({
         apiContentUnitSearchRequest: {
           search: debouncedSearchTerm.substr(1),
-          urls: customRepositories?.flatMap((repo) => {
-            if (!repo.baseurl) {
-              throw new Error(
-                `Repository (id: ${repo.id}, name: ${repo?.name}) is missing baseurl`
-              );
-            }
-            return repo.baseurl;
+          uuids: customRepositories.flatMap((repo) => {
+            return repo.id;
           }),
         },
       });

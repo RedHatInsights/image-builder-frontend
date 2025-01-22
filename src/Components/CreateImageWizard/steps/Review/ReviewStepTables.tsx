@@ -28,18 +28,18 @@ import {
 import PackageInfoNotAvailablePopover from '../Packages/components/PackageInfoNotAvailablePopover';
 
 type repoPropType = {
-  repoUrl: string[] | undefined;
+  repoUuid: string | undefined;
 };
 
-const RepoName = ({ repoUrl }: repoPropType) => {
+const RepoName = ({ repoUuid }: repoPropType) => {
   const { data, isSuccess, isFetching, isError } = useListRepositoriesQuery(
     {
       // @ts-ignore if repoUrl is undefined the query is going to get skipped, so it's safe to ignore the linter here
-      url: repoUrl,
+      uuid: repoUuid ?? '',
       contentType: 'rpm',
-      origin: ContentOrigin.EXTERNAL,
+      origin: ContentOrigin.CUSTOM,
     },
-    { skip: !repoUrl }
+    { skip: !repoUuid }
   );
 
   const errorLoading = () => {
@@ -64,7 +64,7 @@ const RepoName = ({ repoUrl }: repoPropType) => {
         - query finished and the repo was found -> render the name of the repo
         - query finished, but the repo was not found -> render an error
       */}
-      {isSuccess && data?.data?.[0]?.name && <p>{data.data?.[0].name}</p>}
+      {isSuccess && data?.data?.[0]?.name && <p>{data.data[0].name}</p>}
       {isSuccess && !data?.data?.[0]?.name && errorLoading()}
       {isFetching && <Spinner size="md" />}
       {isError && errorLoading()}
@@ -129,7 +129,7 @@ export const SnapshotTable = ({
 }) => {
   const { data, isSuccess, isLoading, isError } = useListRepositoriesQuery({
     uuid: snapshotForDate.map(({ repository_uuid }) => repository_uuid).join(),
-    origin: ContentOrigin.REDHAT + ',' + ContentOrigin.EXTERNAL, // Make sure to show both redhat and external
+    origin: ContentOrigin.REDHAT + ',' + ContentOrigin.CUSTOM, // Make sure to show both redhat and external
   });
 
   const isAfterSet = new Set(
@@ -262,10 +262,10 @@ export const RepositoriesTable = () => {
             </Tr>
           </Thead>
           <Tbody data-testid="repositories-tbody-review">
-            {repositoriesList?.map((repo, repoIndex) => (
+            {repositoriesList.map((repo, repoIndex) => (
               <Tr key={repoIndex + 1}>
                 <Td className="pf-m-width-60">
-                  <RepoName repoUrl={repo.baseurl} />
+                  <RepoName repoUuid={repo.id} />
                 </Td>
               </Tr>
             ))}

@@ -21,6 +21,7 @@ import {
   BlueprintResponse,
   CreateBlueprintRequest,
   Customizations,
+  CustomRepository,
   DistributionProfileItem,
   Distributions,
   File,
@@ -726,7 +727,13 @@ const getFirewall = (state: RootState) => {
 };
 
 const getCustomRepositories = (state: RootState) => {
-  const customRepositories = selectCustomRepositories(state);
+  const customRepositories = selectCustomRepositories(state).map((cr) => {
+    return {
+      ...cr,
+      baseurl: cr.baseurl && cr.baseurl.length !== 0 ? cr.baseurl : undefined,
+    } as CustomRepository;
+  });
+
   const recommendedRepositories = selectRecommendedRepositories(state);
 
   const customAndRecommendedRepositories = [...customRepositories];

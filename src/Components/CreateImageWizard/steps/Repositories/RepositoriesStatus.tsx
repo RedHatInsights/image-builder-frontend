@@ -86,7 +86,11 @@ const RepositoriesStatus = ({
                 isInline
                 isPlain
               />
-              <p className="pf-v5-u-pb-md">Cannot fetch {repoUrl}</p>
+              {repoUrl ? (
+                <p className="pf-v5-u-pb-md">Cannot fetch {repoUrl}</p>
+              ) : (
+                ''
+              )}
               {(repoIntrospections || repoFailCount) && (
                 <>
                   <DescriptionList

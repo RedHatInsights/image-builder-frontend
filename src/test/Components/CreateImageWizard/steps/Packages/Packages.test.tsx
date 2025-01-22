@@ -98,14 +98,11 @@ const getRows = async () => {
 
 const comparePackageSearchResults = async () => {
   const availablePackages = await getRows();
-  await waitFor(() => expect(availablePackages).toHaveLength(6));
+  await waitFor(() => expect(availablePackages).toHaveLength(3));
 
   expect(availablePackages[0]).toHaveTextContent('test');
-  expect(availablePackages[1]).toHaveTextContent('test-sources');
-  expect(availablePackages[2]).toHaveTextContent('testPkg');
-  expect(availablePackages[3]).toHaveTextContent('testPkg-sources');
-  expect(availablePackages[4]).toHaveTextContent('lib-test');
-  expect(availablePackages[5]).toHaveTextContent('lib-test-sources');
+  expect(availablePackages[1]).toHaveTextContent('testPkg');
+  expect(availablePackages[2]).toHaveTextContent('lib-test');
 };
 
 const clickFirstPackageCheckbox = async () => {
@@ -328,7 +325,7 @@ describe('Step Packages', () => {
 
     const availablePackages = await getRows();
     expect(availablePackages[0]).toHaveTextContent('test');
-    expect(availablePackages[1]).toHaveTextContent('test-sources');
+    expect(availablePackages[1]).toHaveTextContent('testPkg');
   });
 
   test('should display recommendations', async () => {
@@ -380,9 +377,9 @@ describe('Step Packages', () => {
 
       // the pagination in the top right
       const top = await screen.findByTestId('packages-pagination-top');
-      expect(top).toHaveTextContent('of 6');
+      expect(top).toHaveTextContent('of 3');
       const bottom = await screen.findByTestId('packages-pagination-bottom');
-      expect(bottom).toHaveTextContent('of 6');
+      expect(bottom).toHaveTextContent('of 3');
     });
 
     test('itemcount correct after toggling selected', async () => {

@@ -337,6 +337,7 @@ export type RecommendPackageApiArg = {
 };
 export type Repository = {
   rhsm: boolean;
+  id?: string | undefined;
   baseurl?: string | undefined;
   mirrorlist?: string | undefined;
   metalink?: string | undefined;
