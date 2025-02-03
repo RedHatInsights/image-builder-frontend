@@ -23,6 +23,7 @@ import { BulkSelect } from './components/BulkSelect';
 import Empty from './components/Empty';
 import { Error } from './components/Error';
 import { Loading } from './components/Loading';
+import UploadRepositoryLabel from './components/UploadRepositoryLabel';
 import {
   convertSchemaToIBCustomRepo,
   convertSchemaToIBPayloadRepo,
@@ -81,10 +82,10 @@ const Repositories = () => {
     () =>
       new Set(
         [
-          ...customRepositories.map(({ baseurl }) => baseurl || []).flat(1),
-          ...(payloadRepositories.map(({ baseurl }) => baseurl) || []),
-          ...(recommendedRepos.map(({ url }) => url) || []),
-        ].filter((url) => !!url) as string[]
+          ...customRepositories.map(({ id }) => id).flat(1),
+          ...payloadRepositories.map(({ id }) => id),
+          ...recommendedRepos.map(({ uuid }) => uuid),
+        ].filter((id) => !!id) as string[]
       ),
     [customRepositories, payloadRepositories, recommendedRepos]
   );
@@ -101,10 +102,10 @@ const Repositories = () => {
     {
       availableForArch: arch,
       availableForVersion: version,
-      origin: ContentOrigin.EXTERNAL,
+      origin: ContentOrigin.CUSTOM,
       limit: 999, // O.O Oh dear, if possible this whole call should be removed
       offset: 0,
-      url: [...initialSelectedState].join(','),
+      uuid: [...initialSelectedState].join(','),
     },
     { refetchOnMountOrArgChange: false }
   );
@@ -126,11 +127,11 @@ const Repositories = () => {
       availableForArch: arch,
       availableForVersion: version,
       contentType: 'rpm',
-      origin: ContentOrigin.EXTERNAL,
+      origin: ContentOrigin.CUSTOM,
       limit: perPage,
       offset: perPage * (page - 1),
       search: debouncedFilterValue,
-      url:
+      uuid:
         toggleSelected === 'toggle-group-selected'
           ? [...selected].join(',')
           : '',
@@ -153,17 +154,17 @@ const Repositories = () => {
     if ((repo as ApiRepositoryResponseRead[])?.length) {
       reposToAdd = (repo as ApiRepositoryResponseRead[]).filter(
         (r) =>
-          r.url &&
-          !isRepoDisabled(r, selected.has(r.url))[0] &&
-          !selected.has(r.url)
+          r.uuid &&
+          !isRepoDisabled(r, selected.has(r.uuid))[0] &&
+          !selected.has(r.uuid)
       );
     } else {
       // Then it should be a single item
       const singleRepo = repo as ApiRepositoryResponseRead;
       if (
-        singleRepo?.url &&
-        !isRepoDisabled(singleRepo, selected.has(singleRepo.url))[0] &&
-        !selected.has(singleRepo.url)
+        singleRepo?.uuid &&
+        !isRepoDisabled(singleRepo, selected.has(singleRepo.uuid))[0] &&
+        !selected.has(singleRepo.uuid)
       ) {
         reposToAdd.push(singleRepo);
       }
@@ -184,9 +185,11 @@ const Repositories = () => {
   };
 
   const clearSelected = () => {
-    const recommendedReposSet = new Set(recommendedRepos.map(({ url }) => url));
+    const recommendedReposSet = new Set(
+      recommendedRepos.map(({ uuid }) => uuid)
+    );
     const initiallySelected = [...selected].some(
-      (url) => url && initialSelectedState.has(url)
+      (uuid) => uuid && initialSelectedState.has(uuid)
     );
 
     if (initiallySelected) {
@@ -197,17 +200,12 @@ const Repositories = () => {
 
     dispatch(
       changeCustomRepositories(
-        customRepositories.filter(({ baseurl }) =>
-          baseurl?.some((url) => recommendedReposSet.has(url))
-        )
+        customRepositories.filter(({ id }) => recommendedReposSet.has(id))
       )
     );
-
     dispatch(
       changePayloadRepositories(
-        payloadRepositories.filter(({ baseurl }) =>
-          recommendedReposSet.has(baseurl)
-        )
+        payloadRepositories.filter(({ id }) => recommendedReposSet.has(id))
       )
     );
   };
@@ -217,41 +215,34 @@ const Repositories = () => {
   ) => {
     if ((repo as ApiRepositoryResponseRead[])?.length) {
       const itemsToRemove = new Set(
-        (repo as ApiRepositoryResponseRead[]).map(({ url }) => url)
+        (repo as ApiRepositoryResponseRead[]).map(({ uuid }) => uuid)
       );
 
       dispatch(
         changeCustomRepositories(
-          customRepositories.filter(
-            ({ baseurl }) => !baseurl?.some((url) => itemsToRemove.has(url))
-          )
+          customRepositories.filter(({ id }) => !itemsToRemove.has(id))
         )
       );
 
       dispatch(
         changePayloadRepositories(
-          payloadRepositories.filter(
-            ({ baseurl }) => !itemsToRemove.has(baseurl)
-          )
+          payloadRepositories.filter(({ id }) => !itemsToRemove.has(id))
         )
       );
 
       return;
     }
 
-    const urlToRemove = (repo as ApiRepositoryResponseRead)?.url;
-    if (urlToRemove) {
+    const uuidToRemove = (repo as ApiRepositoryResponseRead)?.uuid;
+    if (uuidToRemove) {
       dispatch(
         changeCustomRepositories(
-          customRepositories.filter(
-            ({ baseurl }) => !baseurl?.some((url) => urlToRemove === url)
-          )
+          customRepositories.filter(({ id }) => uuidToRemove !== id)
         )
       );
-
       dispatch(
         changePayloadRepositories(
-          payloadRepositories.filter(({ baseurl }) => urlToRemove !== baseurl)
+          payloadRepositories.filter(({ id }) => uuidToRemove !== id)
         )
       );
     }
@@ -264,11 +255,11 @@ const Repositories = () => {
     if (selected) return addSelected(repo);
     if ((repo as ApiRepositoryResponseRead[])?.length) {
       const initiallySelectedItems = (repo as ApiRepositoryResponseRead[]).map(
-        ({ url }) => url
+        ({ uuid }) => uuid
       );
 
       const hasSome = initiallySelectedItems.some(
-        (url) => url && initialSelectedState.has(url)
+        (uuid) => uuid && initialSelectedState.has(uuid)
       );
 
       if (hasSome) {
@@ -278,11 +269,13 @@ const Repositories = () => {
       }
     } else {
       const isInitiallySelected =
-        (repo as ApiRepositoryResponseRead).url &&
-        initialSelectedState.has((repo as ApiRepositoryResponseRead).url || '');
+        (repo as ApiRepositoryResponseRead).uuid &&
+        initialSelectedState.has(
+          (repo as ApiRepositoryResponseRead).uuid || ''
+        );
       if (isInitiallySelected) {
         setModalOpen(true);
-        setReposToRemove([(repo as ApiRepositoryResponseRead).url as string]);
+        setReposToRemove([(repo as ApiRepositoryResponseRead).uuid as string]);
         return;
       }
     }
@@ -296,10 +289,10 @@ const Repositories = () => {
       previousReposData.length !== initialSelectedState.size &&
       previousReposData.length < initialSelectedState.size
     ) {
-      const prevSet = new Set(previousReposData.map(({ url }) => url));
+      const prevSet = new Set(previousReposData.map(({ uuid }) => uuid));
       const itemsToRemove = [...initialSelectedState]
-        .filter((url) => !prevSet.has(url))
-        .map((url) => ({ url })) as ApiRepositoryResponseRead[];
+        .filter((uuid) => !prevSet.has(uuid))
+        .map((uuid) => ({ uuid })) as ApiRepositoryResponseRead[];
       removeSelected(itemsToRemove);
       return initialSelectedState.size - previousReposData.length;
     }
@@ -382,17 +375,13 @@ const Repositories = () => {
 
     dispatch(
       changeCustomRepositories(
-        customRepositories.filter(
-          ({ baseurl }) => !baseurl?.some((url) => itemsToRemove.has(url))
-        )
+        customRepositories.filter(({ id }) => !itemsToRemove.has(id))
       )
     );
 
     dispatch(
       changePayloadRepositories(
-        payloadRepositories.filter(
-          ({ baseurl }) => !itemsToRemove.has(baseurl || '')
-        )
+        payloadRepositories.filter(({ id }) => !itemsToRemove.has(id || ''))
       )
     );
 
@@ -446,7 +435,8 @@ const Repositories = () => {
                 (!selected.size && !contentList.length) ||
                 contentList.every(
                   (repo) =>
-                    repo.url && isRepoDisabled(repo, selected.has(repo.url))[0]
+                    repo.uuid &&
+                    isRepoDisabled(repo, selected.has(repo.uuid))[0]
                 )
               }
             />
@@ -514,9 +504,11 @@ const Repositories = () => {
               <Tbody>
                 {contentList.map((repo, rowIndex) => {
                   const {
+                    uuid = '',
                     url = '',
                     name,
                     status = '',
+                    origin = '',
                     distribution_arch,
                     distribution_versions,
                     package_count,
@@ -526,14 +518,17 @@ const Repositories = () => {
 
                   const [isDisabled, disabledReason] = isRepoDisabled(
                     repo,
-                    selected.has(url)
+                    selected.has(uuid)
                   );
 
                   return (
-                    <Tr key={url}>
+                    <Tr
+                      key={`${uuid}-${rowIndex}`}
+                      data-testid="repositories-row"
+                    >
                       <Td
                         select={{
-                          isSelected: selected.has(url),
+                          isSelected: selected.has(uuid),
                           rowIndex: rowIndex,
                           onSelect: (_, isSelecting) =>
                             handleAddRemove(repo, isSelecting),
@@ -543,18 +538,24 @@ const Repositories = () => {
                       />
                       <Td dataLabel={'Name'}>
                         {name}
-                        <br />
-                        <Button
-                          component="a"
-                          target="_blank"
-                          variant="link"
-                          icon={<ExternalLinkAltIcon />}
-                          iconPosition="right"
-                          isInline
-                          href={url}
-                        >
-                          {url}
-                        </Button>
+                        {origin === ContentOrigin.UPLOAD ? (
+                          <UploadRepositoryLabel />
+                        ) : (
+                          <>
+                            <br />
+                            <Button
+                              component="a"
+                              target="_blank"
+                              variant="link"
+                              icon={<ExternalLinkAltIcon />}
+                              iconPosition="right"
+                              isInline
+                              href={url}
+                            >
+                              {url}
+                            </Button>
+                          </>
+                        )}
                       </Td>
                       <Td dataLabel={'Architecture'}>
                         {distribution_arch || '-'}

@@ -31,10 +31,10 @@ export function BulkSelect({
 }: BulkSelectProps) {
   const [dropdownIsOpen, setDropdownIsOpen] = useState(false);
 
-  const allChecked = !contentList.some(({ url }) => !selected.has(url!));
+  const allChecked = !contentList.some(({ uuid }) => !selected.has(uuid!));
 
   const someChecked =
-    allChecked || contentList.some(({ url }) => selected.has(url!));
+    allChecked || contentList.some(({ uuid }) => selected.has(uuid!));
 
   const toggleDropdown = () => setDropdownIsOpen(!dropdownIsOpen);
 
