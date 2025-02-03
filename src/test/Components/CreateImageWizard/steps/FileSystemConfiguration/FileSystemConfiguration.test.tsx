@@ -17,7 +17,6 @@ import {
 } from '../../wizardTestUtils';
 import {
   blueprintRequest,
-  clickRegisterLater,
   enterBlueprintName,
   interceptBlueprintRequest,
   interceptEditBlueprintRequest,
@@ -44,7 +43,6 @@ const selectImageInstaller = async () => {
 
 const goToFileSystemConfigurationStep = async () => {
   await clickNext(); // Registration
-  await clickRegisterLater();
   await clickNext(); // OpenSCAP
   await clickNext(); // File System
 };

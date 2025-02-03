@@ -5,7 +5,6 @@ import userEvent from '@testing-library/user-event';
 import {
   clickBack,
   clickNext,
-  clickRegisterLater,
   renderCreateMode,
   verifyCancelButton,
 } from '../../wizardTestUtils';
@@ -47,7 +46,6 @@ const setupWithCentos = async () => {
 
 const goToReviewStep = async () => {
   await clickNext(); // Registration
-  await clickRegisterLater();
   await clickNext(); // OpenSCAP
   await clickNext(); // File system configuration
   await clickNext(); // Repository snapshot

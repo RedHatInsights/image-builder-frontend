@@ -21,7 +21,6 @@ import {
   renderCreateMode,
   interceptBlueprintRequest,
   goToRegistrationStep,
-  clickRegisterLater,
   renderEditMode,
   interceptEditBlueprintRequest,
   openAndDismissSaveAndBuildModal,
@@ -29,6 +28,7 @@ import {
   clickBack,
   verifyCancelButton,
   clickReviewAndFinish,
+  clickRegisterCheckbox,
 } from '../../wizardTestUtils';
 
 const localStorageMock = (() => {
@@ -124,7 +124,6 @@ describe('Step Registration', () => {
   test('clicking Next leads to OpenSCAP step', async () => {
     await renderCreateMode();
     await goToRegistrationStep();
-    await clickRegisterLater();
     await clickNext();
     await screen.findByRole('heading', {
       name: 'OpenSCAP profile',
@@ -164,6 +163,7 @@ describe('Step Registration', () => {
 
     await renderCreateMode();
     await goToRegistrationStep();
+    await clickRegisterCheckbox();
     expect(
       await screen.findByRole('button', { name: /Review and finish/ })
     ).toBeDisabled();
@@ -172,6 +172,7 @@ describe('Step Registration', () => {
   test('default registration includes rhsm, rhc and insights', async () => {
     await renderCreateMode();
     await goToRegistrationStep();
+    await clickRegisterCheckbox();
     await openActivationKeyDropdown();
     await selectActivationKey('name0');
     await goToReviewStep();
@@ -186,10 +187,9 @@ describe('Step Registration', () => {
     );
   });
 
-  test('should disable dropdown when clicking Register the system later', async () => {
+  test('should disable dropdown for Register the system later', async () => {
     await renderCreateMode();
     await goToRegistrationStep();
-    await clickRegisterLater();
 
     await waitFor(() =>
       expect(
@@ -208,6 +208,7 @@ describe('Step Registration', () => {
   test('revisit step button on Review works', async () => {
     await renderCreateMode();
     await goToRegistrationStep();
+    await clickRegisterCheckbox();
     await openActivationKeyDropdown();
     await selectActivationKey('name0');
     await goToReviewStep();
@@ -243,6 +244,7 @@ describe('Registration request generated correctly', () => {
   test('register + insights + rhc', async () => {
     await renderCreateMode();
     await goToRegistrationStep();
+    await clickRegisterCheckbox();
     await goToReviewStep();
     // informational modal pops up in the first test only as it's tied
     // to a 'imageBuilder.saveAndBuildModalSeen' variable in localStorage
@@ -268,6 +270,7 @@ describe('Registration request generated correctly', () => {
   test('register + insights', async () => {
     await renderCreateMode();
     await goToRegistrationStep();
+    await clickRegisterCheckbox();
     await clickShowAdditionalConnectionOptions();
     await deselectEnableRemoteRemediations();
     await goToReviewStep();
@@ -292,6 +295,7 @@ describe('Registration request generated correctly', () => {
   test('register now', async () => {
     await renderCreateMode();
     await goToRegistrationStep();
+    await clickRegisterCheckbox();
     await clickShowAdditionalConnectionOptions();
     await deselectPredictiveAnalytics();
     await goToReviewStep();
@@ -320,7 +324,6 @@ describe('Registration request generated correctly', () => {
   test('register later', async () => {
     await renderCreateMode();
     await goToRegistrationStep();
-    await clickRegisterLater();
     await goToReviewStep();
     const receivedRequest = await interceptBlueprintRequest(CREATE_BLUEPRINT);
 
@@ -337,6 +340,7 @@ describe('Registration request generated correctly', () => {
   test('register with no key in local storage', async () => {
     await renderCreateMode();
     await goToRegistrationStep();
+    await clickRegisterCheckbox();
 
     await screen.findByDisplayValue('name0');
     await goToReviewStep();
@@ -364,6 +368,7 @@ describe('Registration request generated correctly', () => {
     await renderCreateMode();
     localStorage.setItem('imageBuilder.recentActivationKey', 'name1');
     await goToRegistrationStep();
+    await clickRegisterCheckbox();
 
     await screen.findByDisplayValue('name1');
     await goToReviewStep();

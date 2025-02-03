@@ -31,7 +31,6 @@ import {
 } from '../../wizardTestUtils';
 import {
   blueprintRequest,
-  clickRegisterLater,
   enterBlueprintName,
   imageRequest,
   interceptBlueprintRequest,
@@ -129,7 +128,6 @@ const selectVMwareTarget = async () => {
 
 const goToReviewStep = async () => {
   await clickNext(); // Registration
-  await clickRegisterLater();
   await clickNext(); // OpenSCAP
   await clickNext(); // File system customization
   await clickNext(); // Repository snapshot

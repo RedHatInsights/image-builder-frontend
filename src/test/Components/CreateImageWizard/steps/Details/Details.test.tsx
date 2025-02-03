@@ -7,7 +7,6 @@ import { detailsCreateBlueprintRequest } from '../../../../fixtures/editMode';
 import { clickNext, getNextButton } from '../../wizardTestUtils';
 import {
   blueprintRequest,
-  clickRegisterLater,
   enterBlueprintName,
   goToRegistrationStep,
   interceptBlueprintRequest,
@@ -68,7 +67,6 @@ describe('Step Details', () => {
   test('with invalid name', async () => {
     await renderCreateMode();
     await goToRegistrationStep();
-    await clickRegisterLater();
     await goToDetailsStep();
     const nextButton = await getNextButton();
     expect(nextButton).toBeEnabled();
@@ -79,7 +77,6 @@ describe('Step Details', () => {
   test('with valid name', async () => {
     await renderCreateMode();
     await goToRegistrationStep();
-    await clickRegisterLater();
     await goToDetailsStep();
     await enterBlueprintName('🤣Red Velvet🤣');
     const nextButton = await getNextButton();
@@ -89,7 +86,6 @@ describe('Step Details', () => {
   test('with non-unique name', async () => {
     await renderCreateMode();
     await goToRegistrationStep();
-    await clickRegisterLater();
     await goToDetailsStep();
     await enterBlueprintName('Lemon Pie');
     const nextButton = await getNextButton();
@@ -99,7 +95,6 @@ describe('Step Details', () => {
   test('name invalid for more than 100 chars', async () => {
     await renderCreateMode();
     await goToRegistrationStep();
-    await clickRegisterLater();
     await goToDetailsStep();
 
     // enter invalid image name
@@ -117,7 +112,6 @@ describe('Step Details', () => {
   test('description invalid for more than 250', async () => {
     await renderCreateMode();
     await goToRegistrationStep();
-    await clickRegisterLater();
     await goToDetailsStep();
 
     // enter invalid image description
@@ -135,7 +129,6 @@ describe('Step Details', () => {
   test('revisit step button on Review works', async () => {
     await renderCreateMode();
     await goToRegistrationStep();
-    await clickRegisterLater();
     await goToDetailsStep();
     await goToReviewStep();
     await clickRevisitButton();
@@ -151,7 +144,6 @@ describe('Details request generated correctly', () => {
   test('without description', async () => {
     await renderCreateMode();
     await goToRegistrationStep();
-    await clickRegisterLater();
     await goToDetailsStep();
     await enterBlueprintName();
     await goToReviewStep();
@@ -168,7 +160,6 @@ describe('Details request generated correctly', () => {
   test('with description', async () => {
     await renderCreateMode();
     await goToRegistrationStep();
-    await clickRegisterLater();
     await goToDetailsStep();
     await enterBlueprintName();
     await enterBlueprintDescription();

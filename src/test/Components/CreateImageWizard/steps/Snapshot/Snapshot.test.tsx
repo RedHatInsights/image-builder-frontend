@@ -12,7 +12,6 @@ import {
 import { clickNext, clickReviewAndFinish } from '../../wizardTestUtils';
 import {
   blueprintRequest,
-  clickRegisterLater,
   enterBlueprintName,
   interceptBlueprintRequest,
   interceptEditBlueprintRequest,
@@ -28,7 +27,6 @@ const goToSnapshotStep = async () => {
   });
   await waitFor(async () => user.click(guestImageCheckBox));
   await clickNext(); // Registration
-  await clickRegisterLater();
   await clickNext(); // OpenSCAP
   await clickNext(); // File System
   await clickNext(); // Repositories snapshot

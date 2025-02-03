@@ -98,7 +98,7 @@ export const goToRegistrationStep = async () => {
   await clickNext();
 };
 
-export const clickRegisterLater = async () => {
+export const clickRegisterCheckbox = async () => {
   const user = userEvent.setup();
   await screen.findByRole('heading', {
     name: /Register systems using this image/,
@@ -111,7 +111,6 @@ export const clickRegisterLater = async () => {
 
 export const goToOscapStep = async () => {
   await clickNext(); // Registration
-  await clickRegisterLater();
   await clickNext(); // OpenSCAP
 };
 

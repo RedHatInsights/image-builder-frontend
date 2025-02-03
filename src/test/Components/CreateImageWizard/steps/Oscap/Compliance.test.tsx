@@ -7,7 +7,6 @@ import { mockBlueprintIds } from '../../../../fixtures/blueprints';
 import { complianceCreateBlueprintRequest } from '../../../../fixtures/editMode';
 import { clickNext } from '../../wizardTestUtils';
 import {
-  clickRegisterLater,
   enterBlueprintName,
   interceptBlueprintRequest,
   interceptEditBlueprintRequest,
@@ -36,7 +35,6 @@ const goToComplianceStep = async () => {
   });
   await waitFor(() => user.click(guestImageCheckBox));
   await clickNext(); // Registration
-  await clickRegisterLater();
   await clickNext(); // Compliance
   await screen.findByRole('heading', { name: /Compliance/ });
   const button = await screen.findByLabelText('Insights compliance');

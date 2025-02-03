@@ -20,7 +20,6 @@ import {
 } from '../../wizardTestUtils';
 import {
   blueprintRequest,
-  clickRegisterLater,
   enterBlueprintName,
   interceptBlueprintRequest,
   interceptEditBlueprintRequest,
@@ -38,7 +37,6 @@ const goToAzureStep = async () => {
 
 const goToReview = async () => {
   await clickNext(); // Register
-  await clickRegisterLater();
   await clickNext(); // OpenSCAP
   await clickNext(); // File system customization
   await clickNext(); // Snapshot repositories

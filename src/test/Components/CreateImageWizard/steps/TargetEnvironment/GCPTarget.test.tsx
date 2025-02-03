@@ -19,7 +19,6 @@ import {
 } from '../../wizardTestUtils';
 import {
   blueprintRequest,
-  clickRegisterLater,
   enterBlueprintName,
   imageRequest,
   interceptBlueprintRequest,
@@ -33,7 +32,6 @@ const GCP_ACCOUNT = 'test@gmail.com';
 
 const goToReview = async () => {
   await clickNext();
-  await clickRegisterLater();
   await clickNext(); // OpenSCAP
   await clickNext(); // File system customization
   await clickNext(); // Snapshot repositories
