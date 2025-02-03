@@ -103,7 +103,7 @@ const Registration = () => {
   const registrationType = useAppSelector(selectRegistrationType);
 
   const [showOptions, setShowOptions] = useState(
-    registrationType === 'register-later'
+    registrationType === 'register-now-rhc'
   );
 
   // TO DO: Remove when rhc starts working for RHEL 10 Beta
