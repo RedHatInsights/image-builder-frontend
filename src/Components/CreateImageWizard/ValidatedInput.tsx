@@ -38,53 +38,153 @@ type HookValidatedInputPropTypes = TextInputProps &
     inputType?: 'textInput' | 'textArea';
   };
 
-export const HookPasswordValidatedInput = ({
-  ariaLabel,
-  placeholder,
-  dataTestId,
-  value,
-  ouiaId,
-  stepValidation,
-  fieldName,
+type passwordPropTypes = TextInputProps & {
+  value: string;
+  stepValidation: StepValidation;
+  fieldName: string;
+};
+
+type ValidatedInputPropTypes = TextInputProps &
+  TextAreaProps & {
+    dataTestId?: string | undefined;
+    ouiaId?: string;
+    ariaLabel: string | undefined;
+    value: string;
+    placeholder?: string;
+    stepValidation: StepValidation;
+    fieldName: string;
+    inputType?: 'textInput' | 'textArea';
+  };
+
+export const PasswordInput = ({
   onChange,
-  warning = undefined,
-  inputType,
-  isDisabled,
-}: HookValidatedInputPropTypes) => {
+  onBlur,
+  placeholder,
+  stepValidation,
+  value,
+  fieldName,
+}: passwordPropTypes) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
+  // Do not surface validation on pristine state components
+  // Allow step validation to be set on pristine state, when needed
+  const validated =
+    value === ''
+      ? 'default'
+      : stepValidation.errors[fieldName] === 'default'
+      ? 'default'
+      : stepValidation.errors[fieldName]
+      ? 'error'
+      : 'success';
 
   return (
     <>
       <InputGroup>
         <InputGroupItem isFill>
-          <HookValidatedInput
-            type={isPasswordVisible ? 'text' : 'password'}
-            ouiaId={ouiaId || ''}
-            data-testid={dataTestId}
+          <TextInput
             value={value}
-            onChange={onChange!}
-            stepValidation={stepValidation}
-            ariaLabel={ariaLabel || ''}
-            fieldName={fieldName}
+            validated={validated}
             placeholder={placeholder || ''}
-            inputType={inputType || 'textInput'}
-            warning={warning || ''}
-            isDisabled={isDisabled || false}
+            type={isPasswordVisible ? 'text' : 'password'}
+            onChange={onChange!}
+            onBlur={onBlur!}
           />
         </InputGroupItem>
         <InputGroupItem>
           <Button
             variant="control"
             onClick={togglePasswordVisibility}
-            aria-label={isPasswordVisible ? 'Show password' : 'Hide password'}
+            aria-label={isPasswordVisible ? 'Hide password' : 'Show password'}
           >
             {isPasswordVisible ? <EyeSlashIcon /> : <EyeIcon />}
           </Button>
         </InputGroupItem>
       </InputGroup>
+    </>
+  );
+};
+
+interface PasswordValidationMessageProps {
+  stepValidation: StepValidation;
+  errorMessage?: string;
+  fieldName: string;
+  isPristine: boolean;
+}
+
+export const ValidationMessage = ({
+  isPristine,
+  stepValidation,
+  errorMessage,
+  fieldName,
+}: PasswordValidationMessageProps) => {
+  const showErrorMessage = !isPristine && stepValidation.errors[fieldName];
+  if (!errorMessage) {
+    return null;
+  }
+
+  return (
+    <>
+      {showErrorMessage && (
+        <HelperText>
+          <HelperTextItem variant="error" hasIcon>
+            {errorMessage}
+          </HelperTextItem>
+        </HelperText>
+      )}
+    </>
+  );
+};
+
+export const InputAndTextArea = ({
+  dataTestId,
+  ouiaId,
+  value,
+  isDisabled,
+  placeholder,
+  onChange,
+  stepValidation,
+  fieldName,
+  inputType,
+  onBlur,
+  ariaLabel,
+}: ValidatedInputPropTypes) => {
+  // Allow step validation to be set on pristine state, when needed
+  const validated =
+    value === ''
+      ? 'default'
+      : stepValidation.errors[fieldName] === 'default'
+      ? 'default'
+      : stepValidation.errors[fieldName]
+      ? 'error'
+      : 'success';
+
+  return (
+    <>
+      {inputType === 'textArea' ? (
+        <TextArea
+          value={value}
+          data-testid={dataTestId}
+          onChange={onChange!}
+          validated={validated}
+          aria-label={ariaLabel || ''}
+          onBlur={onBlur!}
+          placeholder={placeholder || ''}
+          isDisabled={isDisabled || false}
+        />
+      ) : (
+        <TextInput
+          value={value}
+          data-testid={dataTestId}
+          ouiaId={ouiaId || ''}
+          onChange={onChange!}
+          validated={validated}
+          onBlur={onBlur!}
+          placeholder={placeholder || ''}
+          isDisabled={isDisabled || false}
+        />
+      )}
     </>
   );
 };

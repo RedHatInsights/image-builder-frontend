@@ -47,6 +47,7 @@ import {
   isKernelArgumentValid,
   isPortValid,
   isServiceValid,
+  isPasswordValid,
 } from '../validators';
 
 export type StepValidation = {
@@ -68,6 +69,7 @@ export function useIsBlueprintValid(): boolean {
   const services = useServicesValidation();
   const firstBoot = useFirstBootValidation();
   const details = useDetailsValidation();
+  const users = useUsersValidation();
   return (
     !registration.disabledNext &&
     !filesystem.disabledNext &&
@@ -79,7 +81,8 @@ export function useIsBlueprintValid(): boolean {
     !firewall.disabledNext &&
     !services.disabledNext &&
     !firstBoot.disabledNext &&
-    !details.disabledNext
+    !details.disabledNext &&
+    !users.disabledNext
   );
 }
 
@@ -391,22 +394,42 @@ export function useUsersValidation(): StepValidation {
     users.length === 0 ||
     // Case 2: All fields are empty
     (userName === '' && userPassword === '' && userSshKey === '') ||
-    // Case 3: userName is valid and SshKey is valid
+    // Case 3: userName is valid and SshKey or Password is valid
     (userName &&
       isUserNameValid(userName) &&
-      userSshKey &&
-      isSshKeyValid(userSshKey));
+      ((userSshKey && isSshKeyValid(userSshKey)) ||
+        (userPassword && isPasswordValid(userPassword))));
+
+  let userNameError = '';
+  let passError = '';
+  let sshKeyError = '';
+  let disabledNext = !canProceed;
+  if (!isUserNameValid(userName)) {
+    userNameError = 'Invalid user name';
+    disabledNext = true;
+  } else if (!userName) {
+    userNameError = 'default';
+  }
+  if (!isPasswordValid(userPassword)) {
+    passError = 'Password must be between 6 and 128 characters';
+    disabledNext = true;
+  } else if (!userPassword) {
+    passError = '';
+  }
+  if (!isSshKeyValid(userSshKey)) {
+    sshKeyError = 'Invalid SSH key';
+    disabledNext = true;
+  } else if (!userSshKey) {
+    sshKeyError = '';
+  }
 
   return {
     errors: {
-      userName: !isUserNameValid(userName) ? 'Invalid user name' : '',
-      userSshKey: !userSshKey
-        ? ''
-        : !isSshKeyValid(userSshKey)
-        ? 'Invalid SSH key'
-        : '',
+      userName: userNameError,
+      userPassword: passError,
+      userSshKey: sshKeyError,
     },
-    disabledNext: !canProceed,
+    disabledNext: disabledNext,
   };
 }
 
