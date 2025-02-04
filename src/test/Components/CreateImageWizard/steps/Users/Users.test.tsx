@@ -88,6 +88,13 @@ const addUserName = async (userName: string) => {
   await waitFor(() => expect(enterUserName).toHaveValue(userName));
 };
 
+const addPassword = async (password: string) => {
+  const user = userEvent.setup();
+  const enterPassword = screen.getByPlaceholderText(/enter password/i);
+  await waitFor(() => user.type(enterPassword, password));
+  await waitFor(() => expect(enterPassword).toHaveValue(password));
+};
+
 describe('Step Users', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -155,8 +162,25 @@ describe('Step Users', () => {
     await goToUsersStep();
     await clickAddUser();
     await addSshKey('ssh');
+    await addPassword('inval');
     await addUserName('bestUser');
     const invalidUserMessage = screen.getByText(/invalid ssh key/i);
+    await waitFor(() => expect(invalidUserMessage));
+  });
+
+  test('with invalid password', async () => {
+    await renderCreateMode();
+    await goToRegistrationStep();
+    await clickRegisterLater();
+    await goToUsersStep();
+    await clickAddUser();
+    await addUserName(validUserName);
+    await addPassword('inval');
+    await addSshKey(validSshKey);
+
+    const invalidUserMessage = screen.getByText(
+      /Password must be between 6 and 128 characters/i
+    );
     await waitFor(() => expect(invalidUserMessage));
   });
 });
@@ -171,12 +195,13 @@ describe('User request generated correctly', () => {
     await clickAddUser();
     await addUserName(validUserName);
     await addSshKey(validSshKey);
+    await addPassword('thisIsValidPass@@');
     const nextButton = await getNextButton();
     await waitFor(() => expect(nextButton).toBeEnabled());
     const isAdmin = screen.getByRole('checkbox', {
       name: /administrator/i,
     });
-    user.click(isAdmin);
+    await user.click(isAdmin);
     await goToReviewStep();
     // informational modal pops up in the first test only as it's tied
     // to a 'imageBuilder.saveAndBuildModalSeen' variable in localStorage
@@ -189,6 +214,7 @@ describe('User request generated correctly', () => {
           {
             name: 'best',
             ssh_key: 'ssh-rsa d',
+            password: 'thisIsValidPass@@',
             groups: ['wheel'],
           },
         ],

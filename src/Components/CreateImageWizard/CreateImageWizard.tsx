@@ -475,6 +475,7 @@ const CreateImageWizard = ({ isEdit }: CreateImageWizardProps) => {
                 id="wizard-users"
                 key="wizard-users"
                 isHidden={!isUsersEnabled}
+                status={usersValidation.disabledNext ? 'error' : 'default'}
                 footer={
                   <CustomWizardFooter
                     disableNext={usersValidation.disabledNext}

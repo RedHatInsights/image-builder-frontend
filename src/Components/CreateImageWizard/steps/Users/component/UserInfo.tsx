@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Button, FormGroup, Checkbox, Tooltip } from '@patternfly/react-core';
 import { ExternalLinkAltIcon, TrashIcon } from '@patternfly/react-icons';
@@ -18,8 +18,10 @@ import {
 } from '../../../../../store/wizardSlice';
 import { useUsersValidation } from '../../../utilities/useValidation';
 import {
-  HookPasswordValidatedInput,
   HookValidatedInput,
+  InputAndTextArea,
+  PasswordInput,
+  ValidationMessage,
 } from '../../../ValidatedInput';
 const UserInfo = () => {
   const dispatch = useAppDispatch();
@@ -32,6 +34,7 @@ const UserInfo = () => {
   const userSshKey = useAppSelector(userSshKeySelector);
   const userIsAdministratorSelector = selectUserAdministrator(index);
   const userIsAdministrator = useAppSelector(userIsAdministratorSelector);
+  const [isPristine, setIsPristine] = useState(!userPassword ? true : false);
 
   const handleNameChange = (
     _e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -45,6 +48,10 @@ const UserInfo = () => {
     value: string
   ) => {
     dispatch(setUserPasswordByIndex({ index: index, password: value }));
+  };
+
+  const handleBlur = () => {
+    setIsPristine(false);
   };
 
   const handleSshKeyChange = (
@@ -82,25 +89,36 @@ const UserInfo = () => {
         />
       </FormGroup>
       <FormGroup isRequired label="Password">
-        <HookPasswordValidatedInput
-          ariaLabel="blueprint user password"
+        <PasswordInput
           value={userPassword || ''}
-          onChange={(_e, value) => handlePasswordChange(_e, value)}
-          placeholder="Enter password"
           stepValidation={stepValidation}
           fieldName="userPassword"
+          onChange={(_e, value) => handlePasswordChange(_e, value)}
+          placeholder="Enter password"
+          onBlur={handleBlur}
+        />
+        <ValidationMessage
+          isPristine={isPristine}
+          stepValidation={stepValidation}
+          fieldName="userPassword"
+          errorMessage={stepValidation.errors.userPassword}
         />
       </FormGroup>
       <FormGroup isRequired label="SSH key">
-        <HookValidatedInput
+        <InputAndTextArea
           inputType={'textArea'}
           ariaLabel="public SSH key"
           value={userSshKey || ''}
-          type={'text'}
           onChange={(_e, value) => handleSshKeyChange(_e, value)}
           placeholder="Paste your public SSH key"
           stepValidation={stepValidation}
           fieldName="userSshKey"
+        />
+        <ValidationMessage
+          isPristine={isPristine}
+          stepValidation={stepValidation}
+          fieldName="userSshKey"
+          errorMessage={stepValidation.errors.userSshKey}
         />
         <Button
           component="a"
