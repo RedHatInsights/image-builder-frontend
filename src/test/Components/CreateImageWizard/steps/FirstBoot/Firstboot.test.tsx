@@ -11,6 +11,7 @@ import {
   SCRIPT,
   SCRIPT_DOS,
   SCRIPT_WITHOUT_SHEBANG,
+  baseCreateBlueprintRequest,
   firstBootCreateBlueprintRequest,
   firstBootData,
 } from '../../../../fixtures/editMode';
@@ -259,6 +260,30 @@ describe('First Boot edit mode', () => {
       `${EDIT_BLUEPRINT}/${id}`
     );
     const expectedRequest = firstBootCreateBlueprintRequest;
+    expect(receivedRequest).toEqual(expectedRequest);
+  });
+
+  test('enabled service gets removed when first boot script is removed', async () => {
+    const user = userEvent.setup();
+    const id = mockBlueprintIds['firstBoot'];
+    await renderEditMode(id);
+
+    // navigate to the First Boot step
+    const firstBootNavItem = await screen.findAllByRole('button', {
+      name: /first boot/i,
+    });
+    await waitFor(() => user.click(firstBootNavItem[0]));
+
+    // upload empty script file and go to Review
+    await uploadFile(``);
+    await goToReviewStep();
+
+    const receivedRequest = await interceptEditBlueprintRequest(
+      `${EDIT_BLUEPRINT}/${id}`
+    );
+    // both the enabled service and files should be removed
+    // leaving the base blueprint request
+    const expectedRequest = baseCreateBlueprintRequest;
     expect(receivedRequest).toEqual(expectedRequest);
   });
 });
