@@ -262,6 +262,7 @@ const MinimumSize = ({ partition }: MinimumSizePropTypes) => {
           ? 'The Wizard only supports KiB, MiB, or GiB. Adjust or keep the current value.'
           : ''
       }
+      isRequired={true}
       type="text"
       ouiaId="size"
       stepValidation={stepValidation}

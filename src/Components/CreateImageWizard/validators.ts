@@ -33,6 +33,9 @@ export const isGcpEmailValid = (gcpShareWithAccount: string | undefined) => {
 };
 
 export const isMountpointMinSizeValid = (minSize: string) => {
+  if (!minSize) {
+    return false;
+  }
   return /^\d+$/.test(minSize) && parseInt(minSize) > 0;
 };
 
