@@ -282,16 +282,14 @@ const CreateImageWizard = ({ isEdit }: CreateImageWizardProps) => {
     );
 
     // Only this code is different from the original
-    const status =
-      (step.isVisited && step.id !== activeStep?.id && step.status) ||
-      'default';
+    const status = (step.id !== activeStep.id && step.status) || 'default';
 
     return (
       <WizardNavItem
         key={step.id}
         id={step.id}
         content={step.name}
-        isCurrent={activeStep?.id === step.id}
+        isCurrent={activeStep.id === step.id}
         isDisabled={
           step.isDisabled ||
           (isVisitRequired && !step.isVisited && !hasVisitedNextStep)

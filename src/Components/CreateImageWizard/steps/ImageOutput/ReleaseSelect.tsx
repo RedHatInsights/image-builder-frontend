@@ -53,6 +53,10 @@ const ReleaseSelect = () => {
   };
 
   const setDescription = (key: Distributions) => {
+    if (process.env.IS_ON_PREMISE) {
+      return '';
+    }
+
     if (key === RHEL_9_BETA || key === RHEL_10_BETA) {
       return '';
     }

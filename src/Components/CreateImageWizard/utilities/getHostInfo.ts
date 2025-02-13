@@ -5,7 +5,12 @@ import { Distributions } from '../../../store/imageBuilderApi';
 
 export const getHostDistro = async () => {
   const osRel = await read_os_release();
-  return `${osRel.ID}-${osRel.VERSION_ID}` as Distributions;
+  let distro = `${osRel.ID}-${osRel.VERSION_ID}`;
+  // use major releases, and rely on composer's distro aliasing (rhel)
+  if (distro.indexOf('.') !== -1) {
+    distro = distro.split('.')[0];
+  }
+  return distro as Distributions;
 };
 
 type Architecture = 'x86_64' | 'aarch64';

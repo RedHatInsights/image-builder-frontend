@@ -4,7 +4,10 @@ import { UNIQUE_VALIDATION_DELAY } from '../../../constants';
 import { useLazyGetBlueprintsQuery } from '../../../store/backendApi';
 import { useAppSelector } from '../../../store/hooks';
 import { BlueprintsResponse } from '../../../store/imageBuilderApi';
-import { useShowActivationKeyQuery } from '../../../store/rhsmApi';
+import {
+  useListActivationKeysQuery,
+  useShowActivationKeyQuery,
+} from '../../../store/rhsmApi';
 import {
   selectBlueprintId,
   selectBlueprintName,
@@ -78,14 +81,24 @@ export function useRegistrationValidation(): StepValidation {
   const registrationType = useAppSelector(selectRegistrationType);
   const activationKey = useAppSelector(selectActivationKey);
 
-  const { isFetching, isError } = useShowActivationKeyQuery(
-    { name: activationKey! },
-    {
-      skip: !activationKey,
-    }
-  );
+  const {
+    isUninitialized,
+    isFetching: isFetchingKeys,
+    isError: isErrorKeys,
+  } = useListActivationKeysQuery();
+
+  const { isFetching: isFetchingKeyInfo, isError: isErrorKeyInfo } =
+    useShowActivationKeyQuery(
+      { name: activationKey! },
+      {
+        skip: !activationKey,
+      }
+    );
 
   if (registrationType !== 'register-later' && !activationKey) {
+    if (isUninitialized || isFetchingKeys || !isErrorKeys) {
+      return { errors: {}, disabledNext: false };
+    }
     return {
       errors: { activationKey: 'No activation key selected' },
       disabledNext: true,
@@ -95,7 +108,7 @@ export function useRegistrationValidation(): StepValidation {
   if (
     registrationType !== 'register-later' &&
     activationKey &&
-    (isFetching || isError)
+    (isFetchingKeyInfo || isErrorKeyInfo)
   ) {
     return {
       errors: { activationKey: 'Invalid activation key' },
@@ -404,13 +417,13 @@ export function useDetailsValidation(): StepValidation {
   }, [blueprintId, name, setUniqueName, trigger, nameValid]);
 
   let nameError = '';
-  if (!nameValid) {
+  if (name && !nameValid) {
     nameError = 'Invalid blueprint name';
   } else if (uniqueName === false) {
     nameError = 'Blueprint with this name already exists';
   } else if (!blueprintId && uniqueName === null) {
     // Hack to keep the error message from flickering in create mode
-    nameError = 'default';
+    return { errors: { name: '' }, disabledNext: false };
   }
 
   return {
