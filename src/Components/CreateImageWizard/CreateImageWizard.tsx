@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   Button,
@@ -57,7 +57,6 @@ import {
 } from './validators';
 
 import { RHEL_8, RHEL_10_BETA, AARCH64 } from '../../constants';
-import { useListFeaturesQuery } from '../../store/contentSourcesApi';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import './CreateImageWizard.scss';
 import {
@@ -145,6 +144,9 @@ const CreateImageWizard = ({ isEdit }: CreateImageWizardProps) => {
   const dispatch = useAppDispatch();
   const [searchParams] = useSearchParams();
 
+  // Feature flags
+  const isFirstBootEnabled = useFlag('image-builder.firstboot.enabled');
+  const complianceEnabled = useFlag('image-builder.compliance.enabled');
   const isUsersEnabled = useFlag('image-builder.users.enabled');
   const isTimezoneEnabled = useFlag('image-builder.timezone.enabled');
   const isLocaleEnabled = useFlag('image-builder.locale.enabled');
@@ -152,31 +154,6 @@ const CreateImageWizard = ({ isEdit }: CreateImageWizardProps) => {
   const isKernelEnabled = useFlag('image-builder.kernel.enabled');
   const isFirewallEnabled = useFlag('image-builder.firewall.enabled');
   const isServicesStepEnabled = useFlag('image-builder.services.enabled');
-
-  // Remove this and all fallthrough logic when snapshotting is enabled in Prod-stable
-  // =========================TO REMOVE=======================
-  const { data, isSuccess, isFetching, isError } =
-    useListFeaturesQuery(undefined);
-
-  const snapshotsFlag = useFlag('image-builder.snapshots.enabled');
-
-  const snapshottingEnabled = useMemo(() => {
-    if (!snapshotsFlag) return false;
-    // The below checks if other environments permit the snapshot step
-    return !(
-      !isError &&
-      !isFetching &&
-      isSuccess &&
-      data?.snapshots?.accessible === false &&
-      data?.snapshots?.enabled === false
-    );
-  }, [data, isSuccess, isFetching, isError, snapshotsFlag]);
-
-  // =========================TO REMOVE=======================
-
-  // Feature flags
-  const isFirstBootEnabled = useFlag('image-builder.firstboot.enabled');
-  const complianceEnabled = useFlag('image-builder.compliance.enabled');
 
   // IMPORTANT: Ensure the wizard starts with a fresh initial state
   useEffect(() => {
@@ -456,7 +433,9 @@ const CreateImageWizard = ({ isEdit }: CreateImageWizardProps) => {
                 key="wizard-repository-snapshot"
                 navItem={customStatusNavItem}
                 status={snapshotValidation.disabledNext ? 'error' : 'default'}
-                isHidden={!snapshottingEnabled || distribution === RHEL_10_BETA}
+                isHidden={
+                  distribution === RHEL_10_BETA || !!process.env.IS_ON_PREMISE
+                }
                 footer={
                   <CustomWizardFooter
                     disableNext={snapshotValidation.disabledNext}
@@ -633,8 +612,7 @@ const CreateImageWizard = ({ isEdit }: CreateImageWizardProps) => {
             id="step-review"
             footer={<ReviewWizardFooter />}
           >
-            {/* Intentional prop drilling for simplicity - To be removed */}
-            <ReviewStep snapshottingEnabled={snapshottingEnabled} />
+            <ReviewStep />
           </WizardStep>
         </Wizard>
       </PageSection>

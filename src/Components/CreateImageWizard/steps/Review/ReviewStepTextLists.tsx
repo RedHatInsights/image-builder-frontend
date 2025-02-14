@@ -433,11 +433,7 @@ export const TargetEnvOtherList = () => {
   );
 };
 
-export const ContentList = ({
-  snapshottingEnabled,
-}: {
-  snapshottingEnabled: boolean;
-}) => {
+export const ContentList = () => {
   const customRepositories = useAppSelector(selectCustomRepositories);
   const packages = useAppSelector(selectPackages);
   const groups = useAppSelector(selectGroups);
@@ -497,61 +493,54 @@ export const ContentList = ({
     <>
       <TextContent>
         <TextList component={TextListVariants.dl}>
-          {snapshottingEnabled ? (
-            <>
-              <TextListItem
-                component={TextListItemVariants.dt}
-                className="pf-v5-u-min-width"
+          <>
+            <TextListItem
+              component={TextListItemVariants.dt}
+              className="pf-v5-u-min-width"
+            >
+              Repository snapshot
+            </TextListItem>
+            <TextListItem
+              component={TextListItemVariants.dd}
+              data-testid="snapshot-method"
+            >
+              <Popover
+                position="bottom"
+                headerContent={
+                  useLatest
+                    ? 'Repositories as of today'
+                    : `Repositories as of ${yyyyMMddFormat(
+                        new Date(snapshotDate)
+                      )}`
+                }
+                hasAutoWidth
+                minWidth="60rem"
+                bodyContent={
+                  <SnapshotTable snapshotForDate={data?.data || []} />
+                }
               >
-                Repository snapshot
-              </TextListItem>
-              <TextListItem
-                component={TextListItemVariants.dd}
-                data-testid="snapshot-method"
-              >
-                <Popover
-                  position="bottom"
-                  headerContent={
-                    useLatest
-                      ? 'Repositories as of today'
-                      : `Repositories as of ${yyyyMMddFormat(
-                          new Date(snapshotDate)
-                        )}`
-                  }
-                  hasAutoWidth
-                  minWidth="60rem"
-                  bodyContent={
-                    <SnapshotTable snapshotForDate={data?.data || []} />
-                  }
+                <Button
+                  variant="link"
+                  aria-label="Snapshot method"
+                  className="pf-v5-u-p-0"
+                  isDisabled={noRepositoriesSelected || isLoading || isError}
+                  isLoading={isLoading}
                 >
-                  <Button
-                    variant="link"
-                    aria-label="Snapshot method"
-                    className="pf-v5-u-p-0"
-                    isDisabled={noRepositoriesSelected || isLoading || isError}
-                    isLoading={isLoading}
-                  >
-                    {snapshottingText}
-                  </Button>
-                </Popover>
-                {!useLatest &&
-                !isLoading &&
-                isSuccess &&
-                hasSnapshotDateAfter ? (
-                  <Alert
-                    variant="warning"
-                    isInline
-                    isPlain
-                    title="A snapshot for this date is not available for some repositories."
-                  />
-                ) : (
-                  ''
-                )}
-              </TextListItem>
-            </>
-          ) : (
-            ''
-          )}
+                  {snapshottingText}
+                </Button>
+              </Popover>
+              {!useLatest && !isLoading && isSuccess && hasSnapshotDateAfter ? (
+                <Alert
+                  variant="warning"
+                  isInline
+                  isPlain
+                  title="A snapshot for this date is not available for some repositories."
+                />
+              ) : (
+                ''
+              )}
+            </TextListItem>
+          </>
           <TextListItem component={TextListItemVariants.dt}>
             Custom repositories
           </TextListItem>

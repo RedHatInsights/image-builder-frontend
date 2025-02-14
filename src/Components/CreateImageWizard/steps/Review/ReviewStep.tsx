@@ -61,7 +61,7 @@ import {
 } from '../../../../store/wizardSlice';
 import { useFlag } from '../../../../Utilities/useGetEnvironment';
 
-const Review = ({ snapshottingEnabled }: { snapshottingEnabled: boolean }) => {
+const Review = () => {
   const { goToStepById } = useWizardContext();
 
   const blueprintName = useAppSelector(selectBlueprintName);
@@ -349,8 +349,7 @@ const Review = ({ snapshottingEnabled }: { snapshottingEnabled: boolean }) => {
         isIndented
         data-testid="content-expandable"
       >
-        {/* Intentional prop drilling for simplicity - To be removed */}
-        <ContentList snapshottingEnabled={snapshottingEnabled} />
+        <ContentList />
       </ExpandableSection>
       {isUsersEnabled && users.length > 0 && (
         <ExpandableSection

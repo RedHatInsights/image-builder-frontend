@@ -11,11 +11,7 @@ import {
 } from '../../../../store/wizardSlice';
 import { useGenerateDefaultName } from '../../utilities/useGenerateDefaultName';
 
-const ReviewStep = ({
-  snapshottingEnabled,
-}: {
-  snapshottingEnabled: boolean;
-}) => {
+const ReviewStep = () => {
   const blueprintName = useAppSelector(selectBlueprintName);
   const blueprintDescription = useAppSelector(selectBlueprintDescription);
 
@@ -27,8 +23,7 @@ const ReviewStep = ({
         Review {blueprintName} blueprint
       </Title>
       {blueprintDescription && <Text>{blueprintDescription}</Text>}
-      {/* Intentional prop drilling for simplicity - To be removed */}
-      <Review snapshottingEnabled={snapshottingEnabled} />
+      <Review />
     </Form>
   );
 };

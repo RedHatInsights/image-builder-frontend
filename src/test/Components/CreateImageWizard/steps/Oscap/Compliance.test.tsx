@@ -47,6 +47,7 @@ const goToComplianceStep = async () => {
 
 const goToReviewStep = async () => {
   await clickNext(); // File system configuration
+  await clickNext(); // Snapshots
   await clickNext(); // Custom repositories
   await clickNext(); // Additional packages
   await clickNext(); // Details

@@ -59,8 +59,6 @@ vi.mock('@unleash/proxy-client-react', () => ({
         return true;
       case 'image-builder.firstboot.enabled':
         return true;
-      case 'image-builder.snapshots.enabled':
-        return true;
       case 'image-builder.wsl.enabled':
         return true;
       case 'image-builder.pkgrecs.enabled':
