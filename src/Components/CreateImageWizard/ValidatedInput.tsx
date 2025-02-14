@@ -38,11 +38,12 @@ type HookValidatedInputPropTypes = TextInputProps &
     inputType?: 'textInput' | 'textArea';
   };
 
-type passwordPropTypes = TextInputProps & {
+interface PasswordInputProps extends TextInputProps {
   value: string;
   stepValidation: StepValidation;
   fieldName: string;
-};
+  isPristine?: boolean;
+}
 
 type ValidatedInputPropTypes = TextInputProps &
   TextAreaProps & {
@@ -56,6 +57,36 @@ type ValidatedInputPropTypes = TextInputProps &
     inputType?: 'textInput' | 'textArea';
   };
 
+export const PasswordComponent = ({
+  value,
+  stepValidation,
+  fieldName,
+  onChange,
+  onBlur,
+  isPristine,
+  placeholder,
+}: PasswordInputProps) => {
+  return (
+    <>
+      <PasswordInput
+        isPristine={isPristine || false}
+        value={value}
+        placeholder={placeholder || ''}
+        stepValidation={stepValidation}
+        fieldName={fieldName}
+        onChange={onChange!}
+        onBlur={onBlur!}
+      />
+      <ValidationMessage
+        value={value}
+        isPristine={isPristine || false}
+        stepValidation={stepValidation}
+        fieldName={fieldName}
+      />
+    </>
+  );
+};
+
 export const PasswordInput = ({
   onChange,
   onBlur,
@@ -63,7 +94,8 @@ export const PasswordInput = ({
   stepValidation,
   value,
   fieldName,
-}: passwordPropTypes) => {
+  isPristine,
+}: PasswordInputProps) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
@@ -83,6 +115,7 @@ export const PasswordInput = ({
     <>
       <InputGroup>
         <InputGroupItem isFill>
+          {isPristine === isPristine}
           <TextInput
             value={value}
             validated={validated}
@@ -106,26 +139,21 @@ export const PasswordInput = ({
   );
 };
 
-interface PasswordValidationMessageProps {
-  stepValidation: StepValidation;
-  errorMessage?: string;
-  fieldName: string;
-  isPristine: boolean;
-}
-
 export const ValidationMessage = ({
+  value,
   isPristine,
   stepValidation,
-  errorMessage,
   fieldName,
-}: PasswordValidationMessageProps) => {
-  const showErrorMessage = !isPristine && stepValidation.errors[fieldName];
+}: PasswordInputProps) => {
+  const errorMessage = stepValidation.errors[fieldName];
+  const showErrorMessage = !isPristine && errorMessage;
   if (!errorMessage) {
     return null;
   }
 
   return (
     <>
+      {value === value}
       {showErrorMessage && (
         <HelperText>
           <HelperTextItem variant="error" hasIcon>

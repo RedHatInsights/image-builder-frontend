@@ -20,7 +20,7 @@ import { useUsersValidation } from '../../../utilities/useValidation';
 import {
   HookValidatedInput,
   InputAndTextArea,
-  PasswordInput,
+  PasswordComponent,
   ValidationMessage,
 } from '../../../ValidatedInput';
 const UserInfo = () => {
@@ -89,19 +89,14 @@ const UserInfo = () => {
         />
       </FormGroup>
       <FormGroup isRequired label="Password">
-        <PasswordInput
+        <PasswordComponent
           value={userPassword || ''}
           stepValidation={stepValidation}
           fieldName="userPassword"
           onChange={(_e, value) => handlePasswordChange(_e, value)}
           placeholder="Enter password"
           onBlur={handleBlur}
-        />
-        <ValidationMessage
           isPristine={isPristine}
-          stepValidation={stepValidation}
-          fieldName="userPassword"
-          errorMessage={stepValidation.errors.userPassword}
         />
       </FormGroup>
       <FormGroup isRequired label="SSH key">
@@ -115,10 +110,10 @@ const UserInfo = () => {
           fieldName="userSshKey"
         />
         <ValidationMessage
+          value={userSshKey || ''}
           isPristine={isPristine}
           stepValidation={stepValidation}
           fieldName="userSshKey"
-          errorMessage={stepValidation.errors.userSshKey}
         />
         <Button
           component="a"
