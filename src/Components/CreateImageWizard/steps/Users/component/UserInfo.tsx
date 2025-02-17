@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import { Button, FormGroup, Checkbox, Tooltip } from '@patternfly/react-core';
 import { ExternalLinkAltIcon, TrashIcon } from '@patternfly/react-icons';
@@ -19,9 +19,7 @@ import {
 import { useUsersValidation } from '../../../utilities/useValidation';
 import {
   HookValidatedInput,
-  InputAndTextArea,
-  PasswordComponent,
-  ValidationMessage,
+  ValidatedPasswordInput,
 } from '../../../ValidatedInput';
 const UserInfo = () => {
   const dispatch = useAppDispatch();
@@ -34,7 +32,6 @@ const UserInfo = () => {
   const userSshKey = useAppSelector(userSshKeySelector);
   const userIsAdministratorSelector = selectUserAdministrator(index);
   const userIsAdministrator = useAppSelector(userIsAdministratorSelector);
-  const [isPristine, setIsPristine] = useState(!userPassword ? true : false);
 
   const handleNameChange = (
     _e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -48,10 +45,6 @@ const UserInfo = () => {
     value: string
   ) => {
     dispatch(setUserPasswordByIndex({ index: index, password: value }));
-  };
-
-  const handleBlur = () => {
-    setIsPristine(false);
   };
 
   const handleSshKeyChange = (
@@ -89,29 +82,21 @@ const UserInfo = () => {
         />
       </FormGroup>
       <FormGroup isRequired label="Password">
-        <PasswordComponent
+        <ValidatedPasswordInput
           value={userPassword || ''}
           stepValidation={stepValidation}
           fieldName="userPassword"
           onChange={(_e, value) => handlePasswordChange(_e, value)}
           placeholder="Enter password"
-          onBlur={handleBlur}
-          isPristine={isPristine}
         />
       </FormGroup>
       <FormGroup isRequired label="SSH key">
-        <InputAndTextArea
+        <HookValidatedInput
           inputType={'textArea'}
           ariaLabel="public SSH key"
           value={userSshKey || ''}
           onChange={(_e, value) => handleSshKeyChange(_e, value)}
           placeholder="Paste your public SSH key"
-          stepValidation={stepValidation}
-          fieldName="userSshKey"
-        />
-        <ValidationMessage
-          value={userSshKey || ''}
-          isPristine={isPristine}
           stepValidation={stepValidation}
           fieldName="userSshKey"
         />

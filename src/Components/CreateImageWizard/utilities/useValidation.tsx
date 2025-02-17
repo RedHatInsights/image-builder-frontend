@@ -30,6 +30,7 @@ import {
   selectServices,
   selectLanguages,
   selectKeyboard,
+  selectImageTypes,
 } from '../../../store/wizardSlice';
 import { keyboardsList } from '../steps/Locale/keyboardsList';
 import { languagesList } from '../steps/Locale/languagesList';
@@ -389,6 +390,8 @@ export function useUsersValidation(): StepValidation {
   const userSshKeySelector = selectUserSshKeyByIndex(index);
   const userSshKey = useAppSelector(userSshKeySelector);
   const users = useAppSelector(selectUsers);
+  const environments = useAppSelector(selectImageTypes);
+
   const canProceed =
     // Case 1: there is no users
     users.length === 0 ||
@@ -398,7 +401,7 @@ export function useUsersValidation(): StepValidation {
     (userName &&
       isUserNameValid(userName) &&
       ((userSshKey && isSshKeyValid(userSshKey)) ||
-        (userPassword && isPasswordValid(userPassword))));
+        (userPassword && isPasswordValid(userPassword).isValid)));
 
   let userNameError = '';
   let passError = '';
@@ -407,20 +410,38 @@ export function useUsersValidation(): StepValidation {
   if (!isUserNameValid(userName)) {
     userNameError = 'Invalid user name';
     disabledNext = true;
-  } else if (!userName) {
-    userNameError = 'default';
   }
-  if (!isPasswordValid(userPassword)) {
-    passError = 'Password must be between 6 and 128 characters';
+  if (
+    userName &&
+    isUserNameValid(userName) &&
+    environments.includes('azure') &&
+    !isPasswordValid(userPassword).isValid
+  ) {
+    passError =
+      "A password for the target environment 'Azure' must be at least 6 characters long. Please enter a longer password.";
     disabledNext = true;
-  } else if (!userPassword) {
-    passError = '';
+  } else if (
+    environments.includes('azure') &&
+    userName &&
+    isUserNameValid(userName) &&
+    isPasswordValid(userPassword).isValid &&
+    isPasswordValid(userPassword).strength === 'error'
+  ) {
+    passError =
+      'WARNING: This password seems weak, please use with caution or include at least 3 of the following: lowercase letter, uppercase letters, numbers, symbols';
+    disabledNext = false;
+  } else if (
+    userName &&
+    isUserNameValid(userName) &&
+    !isPasswordValid(userPassword).isValid
+  ) {
+    passError =
+      'Password helps protect your account, we recommend a password of at least 6 characters.';
+    disabledNext = false;
   }
   if (!isSshKeyValid(userSshKey)) {
     sshKeyError = 'Invalid SSH key';
     disabledNext = true;
-  } else if (!userSshKey) {
-    sshKeyError = '';
   }
 
   return {

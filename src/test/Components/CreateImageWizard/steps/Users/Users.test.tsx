@@ -179,7 +179,7 @@ describe('Step Users', () => {
     await addSshKey(validSshKey);
 
     const invalidUserMessage = screen.getByText(
-      /Password must be between 6 and 128 characters/i
+      /Password helps protect your account, we recommend a password of at least 6 characters./i
     );
     await waitFor(() => expect(invalidUserMessage));
   });
