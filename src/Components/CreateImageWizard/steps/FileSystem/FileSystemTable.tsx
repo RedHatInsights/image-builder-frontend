@@ -7,8 +7,12 @@ import {
   Button,
   Alert,
   TextInput,
+  Select,
+  MenuToggleElement,
+  MenuToggle,
+  SelectList,
+  SelectOption,
 } from '@patternfly/react-core';
-import { Select, SelectOption } from '@patternfly/react-core/deprecated';
 import { HelpIcon, MinusCircleIcon } from '@patternfly/react-icons';
 import styles from '@patternfly/react-styles/css/components/Table/table';
 import {
@@ -163,6 +167,8 @@ export const mountpointPrefixes = [
   '/var',
 ];
 
+const units = ['GiB', 'MiB', 'KiB'];
+
 type MountpointPrefixPropTypes = {
   partition: Partition;
 };
@@ -173,10 +179,6 @@ const MountpointPrefix = ({ partition }: MountpointPrefixPropTypes) => {
   const prefix = getPrefix(partition.mountpoint);
   const suffix = getSuffix(partition.mountpoint);
 
-  const onToggle = (isOpen: boolean) => {
-    setIsOpen(isOpen);
-  };
-
   const onSelect = (event: React.MouseEvent, selection: string) => {
     setIsOpen(false);
     const mountpoint = selection + (suffix.length > 0 ? '/' + suffix : '');
@@ -185,18 +187,42 @@ const MountpointPrefix = ({ partition }: MountpointPrefixPropTypes) => {
     );
   };
 
+  const onToggleClick = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const toggle = (toggleRef: React.Ref<MenuToggleElement>) => (
+    <MenuToggle
+      ref={toggleRef}
+      onClick={onToggleClick}
+      isExpanded={isOpen}
+      isDisabled={prefix === '/'}
+      data-testid="prefix-select"
+      isFullWidth
+    >
+      {prefix}
+    </MenuToggle>
+  );
+
   return (
     <Select
       ouiaId="mount-point"
       isOpen={isOpen}
-      onToggle={(_event, isOpen) => onToggle(isOpen)}
+      selected={prefix}
       onSelect={onSelect}
-      selections={prefix}
-      isDisabled={prefix === '/'}
+      onOpenChange={(isOpen) => setIsOpen(isOpen)}
+      toggle={toggle}
+      shouldFocusToggleOnSelect
     >
-      {mountpointPrefixes.map((prefix, index) => {
-        return <SelectOption key={index} value={prefix} />;
-      })}
+      <SelectList>
+        {mountpointPrefixes.map((prefix, index) => {
+          return (
+            <SelectOption key={index} value={prefix}>
+              {prefix}
+            </SelectOption>
+          );
+        })}
+      </SelectList>
     </Select>
   );
 };
@@ -291,10 +317,6 @@ const SizeUnit = ({ partition }: SizeUnitPropTypes) => {
   const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = useState(false);
 
-  const onToggle = (isOpen: boolean) => {
-    setIsOpen(isOpen);
-  };
-
   const initialValue = useRef(partition).current;
 
   const onSelect = (event: React.MouseEvent, selection: Units) => {
@@ -310,18 +332,43 @@ const SizeUnit = ({ partition }: SizeUnitPropTypes) => {
     setIsOpen(false);
   };
 
+  const onToggleClick = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const toggle = (toggleRef: React.Ref<MenuToggleElement>) => (
+    <MenuToggle
+      ref={toggleRef}
+      onClick={onToggleClick}
+      isExpanded={isOpen}
+      data-testid="unit-select"
+    >
+      {partition.unit}
+    </MenuToggle>
+  );
+
   return (
     <Select
       ouiaId="unit"
       isOpen={isOpen}
-      onToggle={(_event, isOpen) => onToggle(isOpen)}
+      selected={partition.unit}
       onSelect={onSelect}
-      selections={partition.unit}
+      onOpenChange={(isOpen) => setIsOpen(isOpen)}
+      toggle={toggle}
+      shouldFocusToggleOnSelect
     >
-      <SelectOption value={'KiB'} />
-      <SelectOption value={'MiB'} />
-      <SelectOption value={'GiB'} />
-      <>{initialValue.unit === 'B' && <SelectOption value={'B'} />}</>
+      <SelectList>
+        {units.map((unit, index) => (
+          <SelectOption key={index} value={unit}>
+            {unit}
+          </SelectOption>
+        ))}
+        <>
+          {initialValue.unit === 'B' && (
+            <SelectOption value={'B'}>B</SelectOption>
+          )}
+        </>
+      </SelectList>
     </Select>
   );
 };
