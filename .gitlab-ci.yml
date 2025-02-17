@@ -1,0 +1,43 @@
+stages:
+  - init
+  - test
+  - finish
+
+init:
+  stage: init
+  interruptible: true
+  tags:
+    - shell
+  script:
+    - schutzbot/update_github_status.sh start
+
+test:
+  before_script:
+    - mkdir -p /tmp/artifacts
+    - schutzbot/ci_details.sh > /tmp/artifacts/ci-details-before-run.txt
+    - cat schutzbot/team_ssh_keys.txt | tee -a ~/.ssh/authorized_keys > /dev/null
+  script:
+    - schutzbot/make_rpm_and_install.sh
+    - npx playwright test --ui
+  after_script:
+    - schutzbot/ci_details.sh > /tmp/artifacts/ci-details-after-run.txt || true
+    - schutzbot/unregister.sh || true
+    - schutzbot/update_github_status.sh update || true
+    - schutzbot/save_journal.sh || true
+    - schutzbot/upload_artifacts.sh
+  tags:
+    - terraform
+  parallel:
+    matrix:
+      - RUNNER:
+        INTERNAL_NETWORK: ["true"]
+        - aws/rhel-9.6-nightly-x86_64
+        - aws/rhel-10.0-nightly-x86_64
+
+finish:
+  stage: finish
+  dependencies: []
+  tags:
+    - shell
+  script:
+    - schutzbot/update_github_status.sh finish
