@@ -233,20 +233,26 @@ export function useFirstBootValidation(): StepValidation {
 
 export function useHostnameValidation(): StepValidation {
   const hostname = useAppSelector(selectHostname);
-
   // Error message taken from hostname man page (`man 5 hostname`)
   const errorMessage =
     'Invalid hostname. The hostname should be composed of up to 64 7-bit ASCII lower-case alphanumeric characters or hyphens forming a valid DNS domain name. It is recommended that this name contains only a single label, i.e. without any dots.';
 
+  let hostnameError = '';
+  let disabledNext = false;
   if (!isHostnameValid(hostname)) {
-    return {
-      errors: {
-        hostname: errorMessage,
-      },
-      disabledNext: true,
-    };
+    hostnameError = errorMessage;
+    disabledNext = true;
+  } else if (!hostname) {
+    // Reset validation status when hostname is empty
+    hostnameError = 'default';
   }
-  return { errors: {}, disabledNext: false };
+
+  return {
+    errors: {
+      hostname: hostnameError,
+    },
+    disabledNext: disabledNext,
+  };
 }
 
 export function useKernelValidation(): StepValidation {
