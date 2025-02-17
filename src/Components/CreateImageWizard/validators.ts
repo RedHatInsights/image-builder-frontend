@@ -58,7 +58,9 @@ export const isFileSystemConfigValid = (partitions: Partition[]) => {
 };
 
 export const isUserNameValid = (userName: string) => {
-  if (userName === undefined) return false;
+  if (!userName) {
+    return true;
+  }
   const isLengthValid = userName.length <= 32;
   const isNotNumericOnly = !/^\d+$/.test(userName);
   const isPatternValid = /^[a-zA-Z0-9][a-zA-Z0-9_.-]*[a-zA-Z0-9_$]$/.test(
@@ -69,6 +71,9 @@ export const isUserNameValid = (userName: string) => {
 };
 
 export const isSshKeyValid = (sshKey: string) => {
+  if (!sshKey) {
+    return true;
+  }
   // 1. Key types: ssh-rsa, ssh-dss, ssh-ed25519, or ecdsa-sha2-nistp(256|384|521).
   // 2. Base64-encoded key material.
   // 3. Optional comment at the end.
@@ -77,6 +82,17 @@ export const isSshKeyValid = (sshKey: string) => {
       sshKey
     );
   return isPatternValid;
+};
+
+export const isPasswordValid = (password: string) => {
+  if (!password) {
+    return true;
+  }
+  const isEncrypted = /^\$([^$]+)\$/.test(password);
+  const isLengthValid = password.length >= 6 && password.length <= 128;
+
+  if (isEncrypted) return true;
+  return isLengthValid;
 };
 
 export const getDuplicateMountPoints = (partitions: Partition[]): string[] => {
