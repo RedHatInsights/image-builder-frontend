@@ -1,4 +1,5 @@
 import type { Partition } from './steps/FileSystem/FileSystemTable';
+import { HelperTextVariant } from './steps/Packages/components/CustomHelperText';
 
 export const isAwsAccountIdValid = (awsAccountId: string | undefined) => {
   return (
@@ -84,15 +85,44 @@ export const isSshKeyValid = (sshKey: string) => {
   return isPatternValid;
 };
 
-export const isPasswordValid = (password: string) => {
+interface PasswordValidationResult {
+  isValid: boolean;
+  strength: HelperTextVariant;
+}
+
+export const isPasswordValid = (password: string): PasswordValidationResult => {
+  let strength: HelperTextVariant = 'indeterminate';
+  let rulesCount = 0;
+
   if (!password) {
-    return true;
+    return { isValid: true, strength: 'indeterminate' };
   }
+
   const isEncrypted = /^\$([^$]+)\$/.test(password);
   const isLengthValid = password.length >= 6 && password.length <= 128;
 
-  if (isEncrypted) return true;
-  return isLengthValid;
+  if (isEncrypted) {
+    return { isValid: true, strength: 'success' };
+  }
+  if (/[a-z]/.test(password)) {
+    rulesCount++;
+  }
+  if (/[A-Z]/.test(password)) {
+    rulesCount++;
+  }
+  if (/\d/.test(password)) {
+    rulesCount++;
+  }
+  if (/\W/.test(password)) {
+    rulesCount++;
+  }
+
+  if (rulesCount < 3) {
+    strength = 'error';
+  } else {
+    strength = 'success';
+  }
+  return { isValid: isLengthValid, strength: strength };
 };
 
 export const getDuplicateMountPoints = (partitions: Partition[]): string[] => {

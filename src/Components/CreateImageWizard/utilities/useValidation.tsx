@@ -28,6 +28,7 @@ import {
   selectNtpServers,
   selectFirewall,
   selectServices,
+  selectImageTypes,
 } from '../../../store/wizardSlice';
 import {
   getDuplicateMountPoints,
@@ -352,6 +353,8 @@ export function useUsersValidation(): StepValidation {
   const userSshKeySelector = selectUserSshKeyByIndex(index);
   const userSshKey = useAppSelector(userSshKeySelector);
   const users = useAppSelector(selectUsers);
+  const environments = useAppSelector(selectImageTypes);
+
   const canProceed =
     // Case 1: there is no users
     users.length === 0 ||
@@ -361,7 +364,7 @@ export function useUsersValidation(): StepValidation {
     (userName &&
       isUserNameValid(userName) &&
       ((userSshKey && isSshKeyValid(userSshKey)) ||
-        (userPassword && isPasswordValid(userPassword))));
+        (userPassword && isPasswordValid(userPassword).isValid)));
 
   let userNameError = '';
   let passError = '';
@@ -373,9 +376,29 @@ export function useUsersValidation(): StepValidation {
   } else if (!userName) {
     userNameError = 'default';
   }
-  if (!isPasswordValid(userPassword)) {
-    passError = 'Password must be between 6 and 128 characters';
+  if (
+    userName &&
+    isUserNameValid(userName) &&
+    environments.includes('azure') &&
+    !isPasswordValid(userPassword).isValid
+  ) {
+    passError =
+      "A password for the target environment 'Azure' must be at least 6 characters long. Please enter a longer password.";
     disabledNext = true;
+  } else if (
+    environments.includes('azure') &&
+    userName &&
+    isUserNameValid(userName) &&
+    isPasswordValid(userPassword).isValid &&
+    isPasswordValid(userPassword).strength === 'error'
+  ) {
+    passError =
+      'WARNING: This password seems weak, please use with caution or include at least 3 of the following: lowercase letter, uppercase letters, numbers, symbols';
+    disabledNext = false;
+  } else if (!isPasswordValid(userPassword).isValid) {
+    passError =
+      'Password helps protect your account, we recommend a password of at least 6 characters.';
+    disabledNext = false;
   } else if (!userPassword) {
     passError = '';
   }
