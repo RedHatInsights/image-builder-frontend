@@ -88,23 +88,19 @@ const changePartitionSize = async () => {
 const changePartitionUnitsToKiB = async () => {
   const user = userEvent.setup();
   const row = await getRow(1);
-  const units = await within(row).findAllByRole('button', {
-    name: /options menu/i,
-  });
-  await waitFor(() => user.click(units[1]));
-  const mibibytes = await screen.findByText('KiB');
-  await waitFor(() => user.click(mibibytes));
+  const units = await within(row).findByTestId('unit-select');
+  await waitFor(() => user.click(units));
+  const kibOption = await screen.findByRole('option', { name: 'KiB' });
+  await waitFor(() => user.click(kibOption));
 };
 
 const changePartitionUnitsToMiB = async () => {
   const user = userEvent.setup();
   const row = await getRow(1);
-  const units = await within(row).findAllByRole('button', {
-    name: /options menu/i,
-  });
-  await waitFor(() => user.click(units[1]));
-  const mibibytes = await screen.findByText('MiB');
-  await waitFor(() => user.click(mibibytes));
+  const units = await within(row).findByTestId('unit-select');
+  await waitFor(() => user.click(units));
+  const mibOption = await screen.findByRole('option', { name: 'MiB' });
+  await waitFor(() => user.click(mibOption));
 };
 
 const goToReviewStep = async () => {
@@ -191,9 +187,9 @@ describe('Step File system configuration', () => {
     expect(rows).toHaveLength(3);
 
     //Change mountpoint of final row to /var, resolving errors
-    const mountPointOptions = within(rows[2]).getAllByRole('button', {
-      name: 'Options menu',
-    })[0];
+    const mountPointOptions = await within(rows[2]).findByTestId(
+      'prefix-select'
+    );
     user.click(mountPointOptions);
     const varButton = await within(rows[2]).findByRole('option', {
       name: '/var',
