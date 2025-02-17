@@ -784,6 +784,7 @@ const Packages = () => {
   ) => {
     setSearchTerm(selection);
     setToggleSourceRepos(RepoToggle.INCLUDED);
+    setToggleSelected('toggle-available');
   };
 
   const handleClear = async () => {
