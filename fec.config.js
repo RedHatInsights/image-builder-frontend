@@ -51,6 +51,13 @@ if (process.env.MSW) {
   add_define('process.env.MSW', process.env.MSW);
 }
 
+if (process.env.IMAGE_BUILDER_API_BASEURL) {
+  add_define(
+    'process.env.IMAGE_BUILDER_API_BASEURL',
+    process.env.IMAGE_BUILDER_API_BASEURL
+  );
+}
+
 if (process.env.NODE_ENV) {
   add_define('process.env.NODE_ENV', process.env.NODE_ENV);
 }
@@ -79,6 +86,24 @@ if (process.env.SENTRY_AUTH_TOKEN) {
       }),
     })
   );
+}
+
+if (process.env.FAKE_AUTH) {
+  add_define('process.env.FAKE_AUTH', process.env.FAKE_AUTH);
+}
+
+const devServerConfig = {};
+let customProxy = [];
+
+if (process.env.IMAGE_BUILDER_API_BASEURL) {
+  customProxy = [
+    ...customProxy,
+    {
+      context: ['/api/image-builder/v1'],
+      target: process.env.IMAGE_BUILDER_API_BASEURL,
+      secure: false,
+    },
+  ];
 }
 
 module.exports = {
@@ -144,4 +169,5 @@ module.exports = {
     shared: [{ 'react-router-dom': { singleton: true, version: '*' } }],
     exclude: ['react-router-dom'],
   },
+  customProxy: customProxy,
 };

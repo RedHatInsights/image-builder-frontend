@@ -41,3 +41,5 @@ cockpit/public/main*
 pkg/lib
 
 rpmbuild
+
+container_built.info

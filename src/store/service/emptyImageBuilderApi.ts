@@ -6,10 +6,58 @@ import { IMAGE_BUILDER_API } from '../../constants';
 export const emptyImageBuilderApi = createApi({
   reducerPath: 'imageBuilderApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: window.location.origin + IMAGE_BUILDER_API,
+    baseUrl: IMAGE_BUILDER_API.startsWith('http')
+      ? IMAGE_BUILDER_API
+      : window.location.origin + IMAGE_BUILDER_API,
     prepareHeaders: (headers) => {
       // help the backend distinguish between requests from the UI and the API
       headers.set('X-ImageBuilder-ui', 'true');
+      if (process.env.FAKE_AUTH) {
+        const fakeFullEntitlement = `{
+    "entitlements": {
+		"insights": {
+			"is_entitled": true
+		},
+		"rhel": {
+			"is_entitled": true
+		},
+		"smart_management": {
+			"is_entitled": true
+		},
+		"openshift": {
+			"is_entitled": true
+		},
+		"hybrid": {
+			"is_entitled": true
+		},
+		"migrations": {
+			"is_entitled": true
+		},
+		"ansible": {
+			"is_entitled": true
+		}
+    },
+    "identity": {
+		"type": "User",
+		"user": {
+            "username": "user",
+            "email": "user@user.user",
+            "first_name": "user",
+            "last_name": "user",
+            "is_active": true,
+            "is_org_admin": true,
+            "is_internal": true,
+            "locale": "en-US"
+		},
+		"internal": {"org_id": "000000"},
+		"account_number": "000000"
+    }
+}`;
+        headers.set(
+          'X-Rh-Identity',
+          Buffer.from(fakeFullEntitlement).toString('base64')
+        );
+      }
     },
     paramsSerializer: (params) => {
       /*

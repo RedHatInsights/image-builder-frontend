@@ -9,7 +9,7 @@ if (
   process.env.NODE_ENV === 'development' &&
   process.env.MSW?.toString().toLowerCase() === 'true'
 ) {
-  // process.env.MSW is set in the webpack config using DefinePlugin
+  // process.env.MSW is set in the fec.config.js using DefinePlugin
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { worker } = require('./test/mocks/browser');
   worker.start({
