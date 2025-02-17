@@ -28,7 +28,7 @@ const ImagesTable = () => {
   if (edgeParityFlag) {
     return (
       <AsyncComponent
-        appName="edge"
+        scope="edge"
         module="./Images"
         ErrorComponent={<ErrorState />}
         navigateProp={useNavigate}
