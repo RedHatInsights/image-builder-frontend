@@ -1,0 +1,30 @@
+FROM node:20
+
+USER root
+# frontend-components need a container system
+# this is the reason why we run in docker -> to start podman then
+RUN apt update && apt install -y podman
+
+WORKDIR /app
+
+ARG BACKEND_HOSTNAME=localhost
+ENV BACKEND_HOSTNAME=$BACKEND_HOSTNAME
+
+ARG BACKEND_PORT=8086
+ENV BACKEND_PORT=$BACKEND_PORT
+
+COPY . .
+
+RUN chmod a+x /app/distribution/*.sh
+RUN /app/distribution/create_storage_conf.sh
+
+# Helper to re-run npm ci
+ARG BUILD_DATE=NOT_SET
+ENV BUILD_DATE=$BUILD_DATE
+
+RUN npm ci
+
+EXPOSE 8002
+EXPOSE 1337
+
+CMD [ "npm", "run", "start:local" ]

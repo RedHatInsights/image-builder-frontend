@@ -17,9 +17,6 @@ COCKPIT_REPO_FILES = \
 	pkg/lib \
 	$(NULL)
 
-help:
-	@cat Makefile
-
 #
 # Install target for specfile
 #
@@ -107,3 +104,47 @@ rpm: $(TARFILE)
 		--define "_sourcedir `pwd`" \
 		--define "_topdir $(CURDIR)/rpmbuild" \
 		$(RPM_SPEC)
+.PHONY: help
+help:  ## this help
+	@echo "make [TARGETS...]"
+	@echo
+	@echo 'Targets:'
+	@awk 'match($$0, /^([a-zA-Z_\/-]+):.*? ## (.*)$$/, m) {printf "  \033[36m%-30s\033[0m %s\n", m[1], m[2]}' $(MAKEFILE_LIST) | sort
+	@echo
+	@echo 'Internal Targets:'
+	@awk 'match($$0, /^([a-zA-Z_\/-]+):.*? ### (.*)$$/, m) {printf "  \033[36m%-30s\033[0m %s\n", m[1], m[2]}' $(MAKEFILE_LIST) | sort
+
+
+# either "docker" or "sudo podman"
+# podman needs to build as root as it also needs to run as root afterwards
+CONTAINER_EXECUTABLE ?= docker
+
+DOCKER_IMAGE := image-builder-frontend_dev
+DOCKERFILE := distribution/Dockerfile.dev
+
+# All files to check for rebuild!
+SRC_DEPS := $(shell find . -not -path './node_modules/*' \
+                           -not -path './dist/*' \
+                           -not -path './coverage/*' \
+                           \( -name "*.ts" \
+                           -or -name "*.tsx" \
+                           -or -name "*.yml" \
+                           -or -name "*.yaml" \
+                           -or -name "*.json" \
+                           -or -name "*.js" \) )
+
+clean:
+	rm -f container_built.info
+
+container_built.info: $(DOCKERFILE) $(SRC_DEPS)
+	$(CONTAINER_EXECUTABLE) build -t $(DOCKER_IMAGE) -f $(DOCKERFILE) . --build-arg BUILD_DATE=$(shell date +%Y%m%d_%H%M%S)
+	echo "Container last built on" > $@
+	date >> $@
+
+.PHONY: build
+build:
+	npm run build
+
+.PHONY: container.dev
+container.dev: container_built.info ## build a container with the frontend
+

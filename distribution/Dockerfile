@@ -1,12 +1,22 @@
-FROM node:18
+FROM node:20
 
 WORKDIR /app
 
+ARG BACKEND_HOSTNAME=localhost
+ENV BACKEND_HOSTNAME=$BACKEND_HOSTNAME
+
+ARG BACKEND_PORT=8086
+ENV BACKEND_PORT=$BACKEND_PORT
+
 COPY . .
+
+# Helper to re-run npm ci
+ARG BUILD_DATE=NOT_SET
+ENV BUILD_DATE=$BUILD_DATE
 
 RUN npm ci
 
 EXPOSE 8002
 EXPOSE 1337
 
-CMD [ "npm", "run", "devel" ]
+CMD [ "npm", "run", "start" ]
