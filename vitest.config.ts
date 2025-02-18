@@ -18,7 +18,7 @@ const config = {
     },
     testTimeout: 10000,
     fileParallelism: false,
-    exclude: ['./pkg/lib/**', '**/node_modules/**', '**/dist/**'],
+    exclude: ['./pkg/lib/**', '**/node_modules/**', '**/dist/**', './playwright/**'],
     retry: 3,
   },
   reporters: ['default', 'junit'],
