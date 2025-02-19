@@ -12,6 +12,8 @@ import {
   Button,
   FormGroup,
 } from '@patternfly/react-core';
+import { HelperTextItem } from '@patternfly/react-core';
+import { HelperText } from '@patternfly/react-core';
 import TimesIcon from '@patternfly/react-icons/dist/esm/icons/times-icon';
 
 import { useAppDispatch, useAppSelector } from '../../../../../store/hooks';
@@ -19,12 +21,16 @@ import {
   changeTimezone,
   selectTimezone,
 } from '../../../../../store/wizardSlice';
+import { useTimezoneValidation } from '../../../utilities/useValidation';
 import { timezones } from '../timezonesList';
 
 const TimezoneDropDown = () => {
   const timezone = useAppSelector(selectTimezone);
   const dispatch = useAppDispatch();
 
+  const stepValidation = useTimezoneValidation();
+
+  const [errorText, setErrorText] = useState(stepValidation.errors['timezone']);
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState<string>('');
   const [filterValue, setFilterValue] = useState<string>('');
@@ -67,6 +73,7 @@ const TimezoneDropDown = () => {
     if (value && !value.includes('No results')) {
       setInputValue(value);
       setFilterValue('');
+      setErrorText('');
       dispatch(changeTimezone(value));
       setIsOpen(false);
     }
@@ -88,6 +95,7 @@ const TimezoneDropDown = () => {
   const onClearButtonClick = () => {
     setInputValue('');
     setFilterValue('');
+    setErrorText('');
     dispatch(changeTimezone(''));
   };
 
@@ -143,6 +151,11 @@ const TimezoneDropDown = () => {
           ))}
         </SelectList>
       </Select>
+      {errorText && (
+        <HelperText>
+          <HelperTextItem variant={'error'}>{errorText}</HelperTextItem>
+        </HelperText>
+      )}
     </FormGroup>
   );
 };
