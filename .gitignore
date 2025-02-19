@@ -41,3 +41,9 @@ cockpit/public/main*
 pkg/lib
 
 rpmbuild
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

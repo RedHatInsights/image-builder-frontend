@@ -3,7 +3,6 @@ extends: [
     "@redhat-cloud-services/eslint-config-redhat-cloud-services",
     "plugin:react/recommended",
     "plugin:react-hooks/recommended",
-    "plugin:testing-library/react",
     "plugin:@typescript-eslint/recommended",
     "plugin:react-redux/recommended"
   ]
@@ -56,3 +55,8 @@ rules:
   # Temporarily disabled
   jsx-a11y/no-autofocus: off
   rulesdir/forbid-pf-relative-imports: off
+overrides:
+  - files: ["src/tests/**/*.ts"]
+    extends: "plugin:testing-library/react"
+  - files: ["playwright/**/*.ts"]
+    extends: "plugin:playwright/recommended"
