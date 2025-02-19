@@ -90,39 +90,34 @@ interface PasswordValidationResult {
   strength: HelperTextVariant;
 }
 
-export const isPasswordValid = (password: string): PasswordValidationResult => {
-  let strength: HelperTextVariant = 'indeterminate';
+const isPasswordLengthValid = (password: string): boolean => {
+  if (!password) return true;
+  return password.length >= 6 && password.length <= 128;
+};
+
+const calculatePasswordStrength = (
+  password: string
+): PasswordValidationResult['strength'] => {
+  if (!password) return 'indeterminate';
+
   let rulesCount = 0;
+  if (/[a-z]/.test(password)) rulesCount++; // Lowercase
+  if (/[A-Z]/.test(password)) rulesCount++; // Uppercase
+  if (/\d/.test(password)) rulesCount++; // Digit
+  if (/\W/.test(password)) rulesCount++; // Symbol
+
+  return rulesCount >= 3 ? 'success' : 'error';
+};
+
+export const isPasswordValid = (password: string): PasswordValidationResult => {
+  const isValid = isPasswordLengthValid(password);
+  const strength = calculatePasswordStrength(password);
   const isEncrypted = /^\$([^$]+)\$/.test(password);
-  const isLengthValid = password.length >= 6 && password.length <= 128;
-
-  if (!password) {
-    return { isValid: true, strength: 'indeterminate' };
-  }
-
   if (isEncrypted) {
     return { isValid: true, strength: 'success' };
   }
-  if (/[a-z]/.test(password)) {
-    rulesCount++;
-  }
-  if (/[A-Z]/.test(password)) {
-    rulesCount++;
-  }
-  if (/\d/.test(password)) {
-    rulesCount++;
-  }
-  if (/\W/.test(password)) {
-    rulesCount++;
-  }
 
-  if (rulesCount < 3 && !isEncrypted) {
-    strength = 'error';
-  } else {
-    strength = 'success';
-  }
-
-  return { isValid: isLengthValid, strength: strength };
+  return { isValid, strength };
 };
 
 export const getDuplicateMountPoints = (partitions: Partition[]): string[] => {

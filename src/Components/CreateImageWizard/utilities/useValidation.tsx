@@ -381,6 +381,49 @@ export function useServicesValidation(): StepValidation {
   };
 }
 
+function validateUserName(userName: string): string {
+  if (!isUserNameValid(userName)) {
+    return 'Invalid user name';
+  }
+  return '';
+}
+
+function validatePassword(
+  userPassword: string,
+  environments: string[]
+): string {
+  const DEFAULT_PASSWORD_ERROR_MESSAGE =
+    'Password helps protect your account, we recommend a password of at least 6 characters.';
+  const AZURE_PASSWORD_ERROR_MESSAGE =
+    "A password for the target environment 'Azure' must be at least 6 characters long. Please enter a longer password.";
+  const WEAK_PASSWORD_WARNING =
+    'WARNING: This password seems weak, please use with caution or include at least 3 of the following: lowercase letter, uppercase letters, numbers, symbols';
+
+  const passwordValidationResult = isPasswordValid(userPassword);
+  const isAzureEnvironment = environments.includes('azure');
+
+  if (isAzureEnvironment && !passwordValidationResult.isValid) {
+    return AZURE_PASSWORD_ERROR_MESSAGE;
+  }
+
+  if (isAzureEnvironment && passwordValidationResult.strength === 'error') {
+    return WEAK_PASSWORD_WARNING;
+  }
+
+  if (!passwordValidationResult.isValid) {
+    return DEFAULT_PASSWORD_ERROR_MESSAGE;
+  }
+
+  return '';
+}
+
+function validateSshKey(userSshKey: string): string {
+  if (!isSshKeyValid(userSshKey)) {
+    return 'Invalid SSH key';
+  }
+  return '';
+}
+
 export function useUsersValidation(): StepValidation {
   const index = 0;
   const userNameSelector = selectUserNameByIndex(index);
@@ -392,57 +435,27 @@ export function useUsersValidation(): StepValidation {
   const users = useAppSelector(selectUsers);
   const environments = useAppSelector(selectImageTypes);
 
+  const userNameError = validateUserName(userName);
+  const passError = validatePassword(userPassword, environments);
+  const sshKeyError = validateSshKey(userSshKey);
+
+  const allFieldsAreEmpty = !userName && !userPassword && !userSshKey;
+  const userNameIsValid = userName && isUserNameValid(userName);
+  const sshKeyIsValid = userSshKey && isSshKeyValid(userSshKey);
+  const passwordIsValid =
+    userPassword &&
+    (isPasswordValid(userPassword).isValid ||
+      (!environments.includes('azure') &&
+        !isPasswordValid(userPassword).isValid));
+
   const canProceed =
     // Case 1: there is no users
     users.length === 0 ||
     // Case 2: All fields are empty
-    (userName === '' && userPassword === '' && userSshKey === '') ||
+    allFieldsAreEmpty ||
     // Case 3: userName is valid and SshKey or Password is valid
-    (userName &&
-      isUserNameValid(userName) &&
-      ((userSshKey && isSshKeyValid(userSshKey)) ||
-        (userPassword && isPasswordValid(userPassword).isValid)));
-
-  let userNameError = '';
-  let passError = '';
-  let sshKeyError = '';
-  let disabledNext = !canProceed;
-  if (!isUserNameValid(userName)) {
-    userNameError = 'Invalid user name';
-    disabledNext = true;
-  }
-  if (
-    userName &&
-    isUserNameValid(userName) &&
-    environments.includes('azure') &&
-    !isPasswordValid(userPassword).isValid
-  ) {
-    passError =
-      "A password for the target environment 'Azure' must be at least 6 characters long. Please enter a longer password.";
-    disabledNext = true;
-  } else if (
-    environments.includes('azure') &&
-    userName &&
-    isUserNameValid(userName) &&
-    isPasswordValid(userPassword).isValid &&
-    isPasswordValid(userPassword).strength === 'error'
-  ) {
-    passError =
-      'WARNING: This password seems weak, please use with caution or include at least 3 of the following: lowercase letter, uppercase letters, numbers, symbols';
-    disabledNext = false;
-  } else if (
-    userName &&
-    isUserNameValid(userName) &&
-    !isPasswordValid(userPassword).isValid
-  ) {
-    passError =
-      'Password helps protect your account, we recommend a password of at least 6 characters.';
-    disabledNext = false;
-  }
-  if (!isSshKeyValid(userSshKey)) {
-    sshKeyError = 'Invalid SSH key';
-    disabledNext = true;
-  }
+    (userNameIsValid && (sshKeyIsValid || passwordIsValid));
+  const disabledNext = !canProceed;
 
   return {
     errors: {

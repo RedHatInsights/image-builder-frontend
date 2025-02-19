@@ -168,7 +168,8 @@ export const HookValidatedInput = ({
   inputType,
   warning = undefined,
 }: HookValidatedInputPropTypes) => {
-  const [isPristine, setIsPristine] = useState(!value ? true : false);
+  const isEmpty = value === undefined || value === null || value === '';
+  const [isPristine, setIsPristine] = useState(isEmpty);
   // Do not surface validation on pristine state components
   // Allow step validation to be set on pristine state, when needed
   const validated = isPristine
@@ -180,9 +181,18 @@ export const HookValidatedInput = ({
     : 'success';
 
   const handleBlur = () => {
-    setIsPristine(false);
+    if (isEmpty) {
+      setIsPristine(true);
+    } else {
+      setIsPristine(false);
+    }
   };
 
+  useEffect(() => {
+    if (isEmpty) {
+      setIsPristine(true);
+    }
+  }, [value, setIsPristine]);
   return (
     <>
       {inputType === 'textArea' ? (
