@@ -1,11 +1,13 @@
 import React, { ReactElement, useState } from 'react';
 
-import { FormGroup } from '@patternfly/react-core';
 import {
+  FormGroup,
+  MenuToggle,
+  MenuToggleElement,
   Select,
+  SelectList,
   SelectOption,
-  SelectVariant,
-} from '@patternfly/react-core/deprecated';
+} from '@patternfly/react-core';
 
 import { ARCHES } from '../../../../constants';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
@@ -49,17 +51,34 @@ const ArchSelect = () => {
     return options;
   };
 
+  const onToggleClick = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const toggle = (toggleRef: React.Ref<MenuToggleElement>) => (
+    <MenuToggle
+      ref={toggleRef}
+      onClick={onToggleClick}
+      isExpanded={isOpen}
+      isFullWidth
+      data-testid="arch_select"
+    >
+      {arch}
+    </MenuToggle>
+  );
+
   return (
     <FormGroup isRequired={true} label="Architecture">
       <Select
         ouiaId="arch_select"
-        variant={SelectVariant.single}
-        onToggle={() => setIsOpen(!isOpen)}
-        onSelect={setArch}
-        selections={arch}
         isOpen={isOpen}
+        selected={arch}
+        onSelect={setArch}
+        onOpenChange={(isOpen: boolean) => setIsOpen(isOpen)}
+        toggle={toggle}
+        shouldFocusToggleOnSelect
       >
-        {setSelectOptions()}
+        <SelectList>{setSelectOptions()}</SelectList>
       </Select>
     </FormGroup>
   );
