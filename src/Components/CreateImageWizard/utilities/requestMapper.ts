@@ -566,6 +566,13 @@ const getServices = (state: RootState): Services | undefined => {
     enabledSvcs = [...enabledSvcs, FIRST_BOOT_SERVICE];
   }
   if (
+    (!selectFirstBootScript(state) ||
+      selectFirstBootScript(state).length === 0) &&
+    enabledSvcs.includes(FIRST_BOOT_SERVICE)
+  ) {
+    enabledSvcs = enabledSvcs.filter((s) => s !== FIRST_BOOT_SERVICE);
+  }
+  if (
     enabledSvcs.length === 0 &&
     services.masked.length === 0 &&
     services.disabled.length === 0
