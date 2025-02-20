@@ -30,6 +30,7 @@ import {
   selectServices,
   selectLanguages,
   selectKeyboard,
+  selectImageTypes,
 } from '../../../store/wizardSlice';
 import { keyboardsList } from '../steps/Locale/keyboardsList';
 import { languagesList } from '../steps/Locale/languagesList';
@@ -47,6 +48,7 @@ import {
   isKernelArgumentValid,
   isPortValid,
   isServiceValid,
+  isPasswordValid,
 } from '../validators';
 
 export type StepValidation = {
@@ -68,6 +70,7 @@ export function useIsBlueprintValid(): boolean {
   const services = useServicesValidation();
   const firstBoot = useFirstBootValidation();
   const details = useDetailsValidation();
+  const users = useUsersValidation();
   return (
     !registration.disabledNext &&
     !filesystem.disabledNext &&
@@ -79,7 +82,8 @@ export function useIsBlueprintValid(): boolean {
     !firewall.disabledNext &&
     !services.disabledNext &&
     !firstBoot.disabledNext &&
-    !details.disabledNext
+    !details.disabledNext &&
+    !users.disabledNext
   );
 }
 
@@ -377,6 +381,49 @@ export function useServicesValidation(): StepValidation {
   };
 }
 
+function validateUserName(userName: string): string {
+  if (!isUserNameValid(userName)) {
+    return 'Invalid user name';
+  }
+  return '';
+}
+
+function validatePassword(
+  userPassword: string,
+  environments: string[]
+): string {
+  const DEFAULT_PASSWORD_ERROR_MESSAGE =
+    'Password helps protect your account, we recommend a password of at least 6 characters.';
+  const AZURE_PASSWORD_ERROR_MESSAGE =
+    "A password for the target environment 'Azure' must be at least 6 characters long. Please enter a longer password.";
+  const WEAK_PASSWORD_WARNING =
+    'WARNING: This password seems weak, please use with caution or include at least 3 of the following: lowercase letter, uppercase letters, numbers, symbols';
+
+  const passwordValidationResult = isPasswordValid(userPassword);
+  const isAzureEnvironment = environments.includes('azure');
+
+  if (isAzureEnvironment && !passwordValidationResult.isValid) {
+    return AZURE_PASSWORD_ERROR_MESSAGE;
+  }
+
+  if (isAzureEnvironment && passwordValidationResult.strength === 'error') {
+    return WEAK_PASSWORD_WARNING;
+  }
+
+  if (!passwordValidationResult.isValid) {
+    return DEFAULT_PASSWORD_ERROR_MESSAGE;
+  }
+
+  return '';
+}
+
+function validateSshKey(userSshKey: string): string {
+  if (!isSshKeyValid(userSshKey)) {
+    return 'Invalid SSH key';
+  }
+  return '';
+}
+
 export function useUsersValidation(): StepValidation {
   const index = 0;
   const userNameSelector = selectUserNameByIndex(index);
@@ -386,27 +433,37 @@ export function useUsersValidation(): StepValidation {
   const userSshKeySelector = selectUserSshKeyByIndex(index);
   const userSshKey = useAppSelector(userSshKeySelector);
   const users = useAppSelector(selectUsers);
+  const environments = useAppSelector(selectImageTypes);
+
+  const userNameError = validateUserName(userName);
+  const passError = validatePassword(userPassword, environments);
+  const sshKeyError = validateSshKey(userSshKey);
+
+  const allFieldsAreEmpty = !userName && !userPassword && !userSshKey;
+  const userNameIsValid = userName && isUserNameValid(userName);
+  const sshKeyIsValid = userSshKey && isSshKeyValid(userSshKey);
+  const passwordIsValid =
+    userPassword &&
+    (isPasswordValid(userPassword).isValid ||
+      (!environments.includes('azure') &&
+        !isPasswordValid(userPassword).isValid));
+
   const canProceed =
     // Case 1: there is no users
     users.length === 0 ||
     // Case 2: All fields are empty
-    (userName === '' && userPassword === '' && userSshKey === '') ||
-    // Case 3: userName is valid and SshKey is valid
-    (userName &&
-      isUserNameValid(userName) &&
-      userSshKey &&
-      isSshKeyValid(userSshKey));
+    allFieldsAreEmpty ||
+    // Case 3: userName is valid and SshKey or Password is valid
+    (userNameIsValid && (sshKeyIsValid || passwordIsValid));
+  const disabledNext = !canProceed;
 
   return {
     errors: {
-      userName: !isUserNameValid(userName) ? 'Invalid user name' : '',
-      userSshKey: !userSshKey
-        ? ''
-        : !isSshKeyValid(userSshKey)
-        ? 'Invalid SSH key'
-        : '',
+      userName: userNameError,
+      userPassword: passError,
+      userSshKey: sshKeyError,
     },
-    disabledNext: !canProceed,
+    disabledNext: disabledNext,
   };
 }
 

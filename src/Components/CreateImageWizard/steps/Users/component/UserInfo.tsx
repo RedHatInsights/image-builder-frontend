@@ -18,8 +18,8 @@ import {
 } from '../../../../../store/wizardSlice';
 import { useUsersValidation } from '../../../utilities/useValidation';
 import {
-  HookPasswordValidatedInput,
   HookValidatedInput,
+  ValidatedPasswordInput,
 } from '../../../ValidatedInput';
 const UserInfo = () => {
   const dispatch = useAppDispatch();
@@ -82,13 +82,12 @@ const UserInfo = () => {
         />
       </FormGroup>
       <FormGroup isRequired label="Password">
-        <HookPasswordValidatedInput
-          ariaLabel="blueprint user password"
+        <ValidatedPasswordInput
           value={userPassword || ''}
-          onChange={(_e, value) => handlePasswordChange(_e, value)}
-          placeholder="Enter password"
           stepValidation={stepValidation}
           fieldName="userPassword"
+          onChange={(_e, value) => handlePasswordChange(_e, value)}
+          placeholder="Enter password"
         />
       </FormGroup>
       <FormGroup isRequired label="SSH key">
@@ -96,7 +95,6 @@ const UserInfo = () => {
           inputType={'textArea'}
           ariaLabel="public SSH key"
           value={userSshKey || ''}
-          type={'text'}
           onChange={(_e, value) => handleSshKeyChange(_e, value)}
           placeholder="Paste your public SSH key"
           stepValidation={stepValidation}

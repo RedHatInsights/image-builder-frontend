@@ -1,4 +1,5 @@
 import type { Partition } from './steps/FileSystem/FileSystemTable';
+import { HelperTextVariant } from './steps/Packages/components/CustomHelperText';
 
 export const isAwsAccountIdValid = (awsAccountId: string | undefined) => {
   return (
@@ -58,7 +59,9 @@ export const isFileSystemConfigValid = (partitions: Partition[]) => {
 };
 
 export const isUserNameValid = (userName: string) => {
-  if (userName === undefined) return false;
+  if (!userName) {
+    return true;
+  }
   const isLengthValid = userName.length <= 32;
   const isNotNumericOnly = !/^\d+$/.test(userName);
   const isPatternValid = /^[a-zA-Z0-9][a-zA-Z0-9_.-]*[a-zA-Z0-9_$]$/.test(
@@ -69,6 +72,9 @@ export const isUserNameValid = (userName: string) => {
 };
 
 export const isSshKeyValid = (sshKey: string) => {
+  if (!sshKey) {
+    return true;
+  }
   // 1. Key types: ssh-rsa, ssh-dss, ssh-ed25519, or ecdsa-sha2-nistp(256|384|521).
   // 2. Base64-encoded key material.
   // 3. Optional comment at the end.
@@ -77,6 +83,41 @@ export const isSshKeyValid = (sshKey: string) => {
       sshKey
     );
   return isPatternValid;
+};
+
+interface PasswordValidationResult {
+  isValid: boolean;
+  strength: HelperTextVariant;
+}
+
+const isPasswordLengthValid = (password: string): boolean => {
+  if (!password) return true;
+  return password.length >= 6 && password.length <= 128;
+};
+
+const calculatePasswordStrength = (
+  password: string
+): PasswordValidationResult['strength'] => {
+  if (!password) return 'indeterminate';
+
+  let rulesCount = 0;
+  if (/[a-z]/.test(password)) rulesCount++; // Lowercase
+  if (/[A-Z]/.test(password)) rulesCount++; // Uppercase
+  if (/\d/.test(password)) rulesCount++; // Digit
+  if (/\W/.test(password)) rulesCount++; // Symbol
+
+  return rulesCount >= 3 ? 'success' : 'error';
+};
+
+export const isPasswordValid = (password: string): PasswordValidationResult => {
+  const isValid = isPasswordLengthValid(password);
+  const strength = calculatePasswordStrength(password);
+  const isEncrypted = /^\$([^$]+)\$/.test(password);
+  if (isEncrypted) {
+    return { isValid: true, strength: 'success' };
+  }
+
+  return { isValid, strength };
 };
 
 export const getDuplicateMountPoints = (partitions: Partition[]): string[] => {
