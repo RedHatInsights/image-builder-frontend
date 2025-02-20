@@ -20,6 +20,7 @@ import { useUsersValidation } from '../../../utilities/useValidation';
 import {
   HookPasswordValidatedInput,
   HookValidatedInput,
+  ValidatedInputAndTextArea,
 } from '../../../ValidatedInput';
 const UserInfo = () => {
   const dispatch = useAppDispatch();
@@ -72,7 +73,7 @@ const UserInfo = () => {
   return (
     <>
       <FormGroup isRequired label="Username">
-        <HookValidatedInput
+        <ValidatedInputAndTextArea
           ariaLabel="blueprint user name"
           value={userName || ''}
           placeholder="Enter username"

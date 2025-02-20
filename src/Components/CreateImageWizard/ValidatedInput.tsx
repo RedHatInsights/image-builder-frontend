@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   HelperText,
@@ -15,7 +15,7 @@ import { EyeIcon, EyeSlashIcon } from '@patternfly/react-icons';
 
 import type { StepValidation } from './utilities/useValidation';
 
-interface ValidatedTextInputPropTypes extends TextInputProps {
+type ValidatedTextInputPropTypes = TextInputProps & {
   dataTestId?: string | undefined;
   ouiaId?: string;
   ariaLabel: string | undefined;
@@ -23,7 +23,7 @@ interface ValidatedTextInputPropTypes extends TextInputProps {
   validator: (value: string | undefined) => boolean;
   value: string;
   placeholder?: string;
-}
+};
 
 type HookValidatedInputPropTypes = TextInputProps &
   TextAreaProps & {
@@ -36,6 +36,39 @@ type HookValidatedInputPropTypes = TextInputProps &
     fieldName: string;
     warning?: string;
     inputType?: 'textInput' | 'textArea';
+  };
+
+type ValidationInputPropTypes = TextInputProps &
+  TextAreaProps & {
+    value: string;
+    placeholder?: string;
+    stepValidation: StepValidation;
+    fieldName: string;
+    inputType?: 'textInput' | 'textArea';
+    ariaLabel: string | undefined;
+  };
+
+type ErrorMessageProps = {
+  stepValidation: StepValidation;
+  fieldName: string;
+};
+
+type ValidationStateProps = {
+  stepValidation: StepValidation;
+  fieldName: string;
+  isPristine: boolean;
+};
+
+type ValidationResult = {
+  validated: 'default' | 'success' | 'error';
+};
+
+type InputTextAreaProps = TextInputProps &
+  TextAreaProps & {
+    value: string;
+    ariaLabel: string | undefined;
+    stepValidation: StepValidation;
+    fieldName: string;
   };
 
 export const HookPasswordValidatedInput = ({
@@ -85,6 +118,119 @@ export const HookPasswordValidatedInput = ({
           </Button>
         </InputGroupItem>
       </InputGroup>
+    </>
+  );
+};
+
+const useValidationState = ({
+  stepValidation,
+  fieldName,
+  isPristine,
+}: ValidationStateProps): ValidationResult => {
+  const validated = isPristine
+    ? 'default'
+    : stepValidation.errors[fieldName]
+    ? 'error'
+    : 'success';
+
+  return { validated };
+};
+
+export const TextAndTextAreaInput = ({
+  inputType,
+  placeholder,
+  stepValidation,
+  value,
+  onChange,
+  fieldName,
+  ariaLabel,
+}: ValidationInputPropTypes) => {
+  const isEmpty = value === undefined || value === null || value === '';
+  const [isPristine, setIsPristine] = useState(isEmpty);
+  const { validated } = useValidationState({
+    isPristine,
+    stepValidation,
+    fieldName,
+  });
+
+  const handleBlur = () => {
+    if (isEmpty) {
+      setIsPristine(true);
+    } else {
+      setIsPristine(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isEmpty) {
+      setIsPristine(true);
+    }
+  }, [value, setIsPristine]);
+
+  return (
+    <>
+      {inputType === 'textArea' ? (
+        <TextArea
+          value={value}
+          onChange={onChange!}
+          validated={validated}
+          onBlur={handleBlur}
+          placeholder={placeholder || ''}
+          aria-label={ariaLabel || ''}
+        />
+      ) : (
+        <TextInput
+          value={value}
+          onChange={onChange!}
+          validated={validated}
+          onBlur={handleBlur}
+          placeholder={placeholder || ''}
+          aria-label={ariaLabel || ''}
+        />
+      )}
+    </>
+  );
+};
+
+export const ErrorMessage = ({
+  stepValidation,
+  fieldName,
+}: ErrorMessageProps) => {
+  const errorMessage = stepValidation.errors[fieldName];
+  if (!errorMessage) {
+    return null;
+  }
+
+  return (
+    <HelperText>
+      <HelperTextItem variant="error" hasIcon>
+        {errorMessage}
+      </HelperTextItem>
+    </HelperText>
+  );
+};
+
+export const ValidatedInputAndTextArea = ({
+  value,
+  stepValidation,
+  fieldName,
+  onBlur,
+  placeholder,
+  onChange,
+  ariaLabel,
+}: InputTextAreaProps) => {
+  return (
+    <>
+      <TextAndTextAreaInput
+        ariaLabel={ariaLabel || ''}
+        value={value}
+        placeholder={placeholder || ''}
+        stepValidation={stepValidation}
+        fieldName={fieldName}
+        onChange={onChange!}
+        onBlur={onBlur!}
+      />
+      <ErrorMessage stepValidation={stepValidation} fieldName={fieldName} />
     </>
   );
 };

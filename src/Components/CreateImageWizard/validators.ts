@@ -58,7 +58,9 @@ export const isFileSystemConfigValid = (partitions: Partition[]) => {
 };
 
 export const isUserNameValid = (userName: string) => {
-  if (userName === undefined) return false;
+  if (!userName) {
+    return true;
+  }
   const isLengthValid = userName.length <= 32;
   const isNotNumericOnly = !/^\d+$/.test(userName);
   const isPatternValid = /^[a-zA-Z0-9][a-zA-Z0-9_.-]*[a-zA-Z0-9_$]$/.test(
