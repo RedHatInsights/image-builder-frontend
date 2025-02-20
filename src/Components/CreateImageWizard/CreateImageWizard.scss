@@ -9,11 +9,6 @@
     pointer-events: initial;
 }
 
-.pf-v5-c-dual-list-selector {
-    --pf-v5-c-dual-list-selector__menu--MinHeight: 18rem;
-    --pf-v5-c-dual-list-selector--GridTemplateColumns--pane--MinMax--max: 100vw;
-}
-
 .pf-c-form {
     --pf-c-form--GridGap: var(--pf-v5-global--spacer--md);
 }
@@ -78,11 +73,6 @@ div.pf-v5-c-alert.pf-m-inline.pf-m-plain.pf-m-warning {
     h4 {
         margin-block-start: 0;
     }
-}
-
-// This is to fix the pagination UI bug, when patternfly updates this it can be removed!
-.pf-v5-c-pagination.pf-m-bottom .pf-v5-c-menu-toggle {
-    display: flex
 }
 
 .pf-v5-c-wizard__main {
