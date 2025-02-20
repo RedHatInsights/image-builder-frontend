@@ -1,0 +1,33 @@
+name: sentryInit
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      commit_hash:
+        description: 'The commit hash (or branch/tag) to build'
+        required: false
+        default: ''
+
+jobs:
+  createSentryRelease:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.commit_hash || 'refs/heads/master' }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        env:
+          ENABLE_SENTRY:  ${{ secrets.ENABLE_SENTRY }}
+          SENTRY_RELEASE: ${{ github.event.inputs.commit_hash && github.event.inputs.commit_hash }}
+          SENTRY_AUTH_TOKEN: ${{ github.event.inputs.commit_hash && secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        run: npm run build --if-present
