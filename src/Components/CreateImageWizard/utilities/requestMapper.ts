@@ -85,6 +85,7 @@ import {
   selectMetadata,
   selectFirewall,
 } from '../../../store/wizardSlice';
+import isRhel from '../../../Utilities/isRhel';
 import { FileSystemConfigurationType } from '../steps/FileSystem';
 import {
   getConversionFactor,
@@ -364,12 +365,15 @@ export const mapRequestToState = (request: BlueprintResponse): wizardState => {
       baseUrl: request.customizations.subscription?.['base-url'] || '',
     },
     registration: {
-      registrationType: request.customizations?.subscription
-        ? request.customizations.subscription.rhc
-          ? 'register-now-rhc'
-          : 'register-now-insights'
-        : 'register-later',
-      activationKey: request.customizations.subscription?.['activation-key'],
+      registrationType:
+        request.customizations?.subscription && isRhel(request.distribution)
+          ? request.customizations.subscription.rhc
+            ? 'register-now-rhc'
+            : 'register-now-insights'
+          : 'register-later',
+      activationKey: isRhel(request.distribution)
+        ? request.customizations.subscription?.['activation-key']
+        : undefined,
     },
     ...commonRequestToState(request),
   };

@@ -28,7 +28,11 @@ import {
   selectNtpServers,
   selectFirewall,
   selectServices,
+  selectLanguages,
+  selectKeyboard,
 } from '../../../store/wizardSlice';
+import { keyboardsList } from '../steps/Locale/keyboardsList';
+import { languagesList } from '../steps/Locale/languagesList';
 import {
   getDuplicateMountPoints,
   isBlueprintNameValid,
@@ -57,6 +61,7 @@ export function useIsBlueprintValid(): boolean {
   const filesystem = useFilesystemValidation();
   const snapshot = useSnapshotValidation();
   const timezone = useTimezoneValidation();
+  const locale = useLocaleValidation();
   const hostname = useHostnameValidation();
   const kernel = useKernelValidation();
   const firewall = useFirewallValidation();
@@ -68,6 +73,7 @@ export function useIsBlueprintValid(): boolean {
     !filesystem.disabledNext &&
     !snapshot.disabledNext &&
     !timezone.disabledNext &&
+    !locale.disabledNext &&
     !hostname.disabledNext &&
     !kernel.disabledNext &&
     !firewall.disabledNext &&
@@ -177,6 +183,37 @@ export function useTimezoneValidation(): StepValidation {
   }
 
   return { errors: {}, disabledNext: false };
+}
+
+export function useLocaleValidation(): StepValidation {
+  const languages = useAppSelector(selectLanguages);
+  const keyboard = useAppSelector(selectKeyboard);
+
+  const errors = {};
+  const unknownLanguages = [];
+
+  if (languages && languages.length > 0) {
+    for (const lang of languages) {
+      if (!languagesList.includes(lang)) {
+        unknownLanguages.push(lang);
+      }
+    }
+
+    if (unknownLanguages.length > 0) {
+      Object.assign(errors, {
+        languages: unknownLanguages.join(' '),
+      });
+    }
+  }
+
+  if (keyboard && !keyboardsList.includes(keyboard)) {
+    Object.assign(errors, { keyboard: 'Unknown keyboard' });
+  }
+
+  return {
+    errors,
+    disabledNext: unknownLanguages.length > 0 || 'keyboard' in errors,
+  };
 }
 
 export function useFirstBootValidation(): StepValidation {

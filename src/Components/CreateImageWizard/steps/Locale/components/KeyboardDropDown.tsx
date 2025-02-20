@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import {
   Button,
   FormGroup,
+  HelperText,
+  HelperTextItem,
   MenuToggle,
   MenuToggleElement,
   Select,
@@ -20,12 +22,16 @@ import {
   selectKeyboard,
 } from '../../../../../store/wizardSlice';
 import sortfn from '../../../../../Utilities/sortfn';
+import { useLocaleValidation } from '../../../utilities/useValidation';
 import { keyboardsList } from '../keyboardsList';
 
 const KeyboardDropDown = () => {
   const keyboard = useAppSelector(selectKeyboard);
   const dispatch = useAppDispatch();
 
+  const stepValidation = useLocaleValidation();
+
+  const [errorText, setErrorText] = useState(stepValidation.errors['keyboard']);
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState<string>('');
   const [filterValue, setFilterValue] = useState<string>('');
@@ -70,6 +76,7 @@ const KeyboardDropDown = () => {
     if (value && !value.includes('No results')) {
       setInputValue(value);
       setFilterValue('');
+      setErrorText('');
       dispatch(changeKeyboard(value));
       setIsOpen(false);
     }
@@ -91,6 +98,7 @@ const KeyboardDropDown = () => {
   const onClearButtonClick = () => {
     setInputValue('');
     setFilterValue('');
+    setErrorText('');
     dispatch(changeKeyboard(''));
   };
 
@@ -146,6 +154,11 @@ const KeyboardDropDown = () => {
           ))}
         </SelectList>
       </Select>
+      {errorText && (
+        <HelperText>
+          <HelperTextItem variant={'error'}>{errorText}</HelperTextItem>
+        </HelperText>
+      )}
     </FormGroup>
   );
 };

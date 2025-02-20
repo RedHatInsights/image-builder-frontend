@@ -1,5 +1,5 @@
 Name:           cockpit-image-builder
-Version:        61
+Version:        62
 Release:        1%{?dist}
 Summary:        Image builder plugin for Cockpit
 

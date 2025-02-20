@@ -45,9 +45,12 @@ const setupWithCentos = async () => {
   await selectGuestImage();
 };
 
-const goToReviewStep = async () => {
+const handleRegistration = async () => {
   await clickNext(); // Registration
   await clickRegisterLater();
+};
+
+const goToReviewStep = async () => {
   await clickNext(); // OpenSCAP
   await clickNext(); // File system configuration
   await clickNext(); // Repository snapshot
@@ -73,6 +76,7 @@ describe('Step Review', () => {
 
   test('has 3 buttons', async () => {
     await setupWithRhel();
+    await handleRegistration();
     await goToReviewStep();
     await screen.findByRole('button', { name: /Create blueprint/ });
     await screen.findByRole('button', { name: /Back/ });
@@ -81,6 +85,7 @@ describe('Step Review', () => {
 
   test('clicking Back loads Image name', async () => {
     await setupWithRhel();
+    await handleRegistration();
     await goToReviewStep();
     await clickBack();
     await screen.findByRole('heading', {
@@ -90,12 +95,14 @@ describe('Step Review', () => {
 
   test('clicking Cancel loads landing page', async () => {
     await setupWithRhel();
+    await handleRegistration();
     await goToReviewStep();
     await verifyCancelButton(router);
   });
 
   test('has Registration expandable section for rhel', async () => {
     await setupWithRhel();
+    await handleRegistration();
     await goToReviewStep();
 
     await screen.findByRole('heading', { name: /Review/ });

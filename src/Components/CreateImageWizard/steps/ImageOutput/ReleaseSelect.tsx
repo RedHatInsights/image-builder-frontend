@@ -23,6 +23,7 @@ import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { Distributions } from '../../../../store/imageBuilderApi';
 import {
   changeDistribution,
+  changeRegistrationType,
   selectDistribution,
 } from '../../../../store/wizardSlice';
 import isRhel from '../../../../Utilities/isRhel';
@@ -44,6 +45,11 @@ const ReleaseSelect = () => {
   const releases = process.env.IS_ON_PREMISE ? ON_PREM_RELEASES : RELEASES;
 
   const handleSelect = (_event: React.MouseEvent, selection: Distributions) => {
+    if (!isRhel(selection)) {
+      dispatch(changeRegistrationType('register-later'));
+    } else {
+      dispatch(changeRegistrationType('register-now-rhc'));
+    }
     dispatch(changeDistribution(selection));
     setIsOpen(false);
   };

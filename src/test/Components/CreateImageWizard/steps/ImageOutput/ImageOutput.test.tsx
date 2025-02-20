@@ -127,9 +127,12 @@ const selectVMwareTarget = async () => {
   await waitFor(() => user.click(vmwareImageCheckBox));
 };
 
-const goToReviewStep = async () => {
+const handleRegistration = async () => {
   await clickNext(); // Registration
   await clickRegisterLater();
+};
+
+const goToReviewStep = async () => {
   await clickNext(); // OpenSCAP
   await clickNext(); // File system customization
   await clickNext(); // Repository snapshot
@@ -308,6 +311,7 @@ describe('Step Image output', () => {
   test('revisit step button on Review works', async () => {
     await renderCreateMode();
     await selectGuestImageTarget();
+    await handleRegistration();
     await goToReviewStep();
     await clickRevisitButton();
     await screen.findByRole('heading', { name: /Image output/ });
@@ -567,6 +571,7 @@ describe('Set target using query parameter', () => {
   test('image-installer (query parameter provided)', async () => {
     await renderCreateMode({ target: 'iso' });
     expect(await screen.findByTestId('checkbox-image-installer')).toBeChecked();
+    await handleRegistration();
     await goToReviewStep();
     const targetExpandable = await screen.findByTestId(
       'target-environments-expandable'
@@ -578,6 +583,7 @@ describe('Set target using query parameter', () => {
   test('guest-image (query parameter provided)', async () => {
     await renderCreateMode({ target: 'qcow2' });
     expect(await screen.findByTestId('checkbox-guest-image')).toBeChecked();
+    await handleRegistration();
     await goToReviewStep();
     const targetExpandable = await screen.findByTestId(
       'target-environments-expandable'
@@ -596,6 +602,7 @@ describe('Distribution request generated correctly', () => {
     await renderCreateMode();
     await selectRhel8();
     await selectGuestImageTarget();
+    await handleRegistration();
     await goToReviewStep();
     // informational modal pops up in the first test only as it's tied
     // to a 'imageBuilder.saveAndBuildModalSeen' variable in localStorage
@@ -614,6 +621,7 @@ describe('Distribution request generated correctly', () => {
     await renderCreateMode();
     await selectRhel9();
     await selectGuestImageTarget();
+    await handleRegistration();
     await goToReviewStep();
     const receivedRequest = await interceptBlueprintRequest(CREATE_BLUEPRINT);
 
@@ -650,6 +658,7 @@ describe('Architecture request generated correctly', () => {
     await renderCreateMode();
     await selectX86_64();
     await selectGuestImageTarget();
+    await handleRegistration();
     await goToReviewStep();
     const receivedRequest = await interceptBlueprintRequest(CREATE_BLUEPRINT);
 
@@ -669,6 +678,7 @@ describe('Architecture request generated correctly', () => {
     await renderCreateMode();
     await selectAarch64();
     await selectGuestImageTarget();
+    await handleRegistration();
     await goToReviewStep();
     const receivedRequest = await interceptBlueprintRequest(CREATE_BLUEPRINT);
 

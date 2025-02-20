@@ -5,6 +5,8 @@ import {
   Chip,
   ChipGroup,
   FormGroup,
+  HelperText,
+  HelperTextItem,
   MenuToggle,
   MenuToggleElement,
   Select,
@@ -23,11 +25,17 @@ import {
   selectLanguages,
 } from '../../../../../store/wizardSlice';
 import sortfn from '../../../../../Utilities/sortfn';
+import { useLocaleValidation } from '../../../utilities/useValidation';
 import { languagesList } from '../languagesList';
 
 const LanguagesDropDown = () => {
   const languages = useAppSelector(selectLanguages);
   const dispatch = useAppDispatch();
+
+  const stepValidation = useLocaleValidation();
+  const unknownLanguages = stepValidation.errors['languages']
+    ? stepValidation.errors['languages'].split(' ')
+    : [];
 
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState<string>('');
@@ -92,6 +100,13 @@ const LanguagesDropDown = () => {
     setFilterValue('');
   };
 
+  const handleRemoveLang = (_event: React.MouseEvent, value: string) => {
+    dispatch(removeLanguage(value));
+    if (unknownLanguages.length > 0) {
+      unknownLanguages.filter((lang) => lang !== value);
+    }
+  };
+
   const toggle = (toggleRef: React.Ref<MenuToggleElement>) => (
     <MenuToggle
       ref={toggleRef}
@@ -137,15 +152,31 @@ const LanguagesDropDown = () => {
       >
         <SelectList>
           {selectOptions.map((option) => (
-            <SelectOption key={option} value={option}>
+            <SelectOption
+              key={option}
+              value={option}
+              isDisabled={languages?.includes(option) || false}
+              description={
+                languages?.includes(option) && 'Language already added'
+              }
+            >
               {option}
             </SelectOption>
           ))}
         </SelectList>
       </Select>
+      {unknownLanguages.length > 0 && (
+        <HelperText>
+          <HelperTextItem
+            variant={'error'}
+          >{`Unknown languages: ${unknownLanguages.join(
+            ', '
+          )}`}</HelperTextItem>
+        </HelperText>
+      )}
       <ChipGroup numChips={5} className="pf-v5-u-mt-sm pf-v5-u-w-100">
         {languages?.map((lang) => (
-          <Chip key={lang} onClick={() => dispatch(removeLanguage(lang))}>
+          <Chip key={lang} onClick={(e) => handleRemoveLang(e, lang)}>
             {lang}
           </Chip>
         ))}

@@ -47,6 +47,7 @@ import {
   useTimezoneValidation,
   useFirewallValidation,
   useServicesValidation,
+  useLocaleValidation,
 } from './utilities/useValidation';
 import {
   isAwsAccountIdValid,
@@ -77,6 +78,7 @@ import {
   selectImageTypes,
   addImageType,
 } from '../../store/wizardSlice';
+import isRhel from '../../Utilities/isRhel';
 import { resolveRelPath } from '../../Utilities/path';
 import { useFlag } from '../../Utilities/useGetEnvironment';
 import { ImageBuilderHeader } from '../sharedComponents/ImageBuilderHeader';
@@ -225,6 +227,8 @@ const CreateImageWizard = ({ isEdit }: CreateImageWizardProps) => {
   const fileSystemValidation = useFilesystemValidation();
   // Timezone
   const timezoneValidation = useTimezoneValidation();
+  // Locale
+  const localeValidation = useLocaleValidation();
   // Hostname
   const hostnameValidation = useHostnameValidation();
   // Kernel
@@ -376,7 +380,7 @@ const CreateImageWizard = ({ isEdit }: CreateImageWizardProps) => {
                 name="Register"
                 id="step-register"
                 key="step-register"
-                isHidden={!!process.env.IS_ON_PREMISE}
+                isHidden={!!process.env.IS_ON_PREMISE || !isRhel(distribution)}
                 navItem={customStatusNavItem}
                 status={
                   registrationValidation.disabledNext ? 'error' : 'default'
@@ -506,8 +510,12 @@ const CreateImageWizard = ({ isEdit }: CreateImageWizardProps) => {
                 key="wizard-locale"
                 navItem={customStatusNavItem}
                 isHidden={!isLocaleEnabled}
+                status={localeValidation.disabledNext ? 'error' : 'default'}
                 footer={
-                  <CustomWizardFooter disableNext={false} optional={true} />
+                  <CustomWizardFooter
+                    disableNext={localeValidation.disabledNext}
+                    optional={true}
+                  />
                 }
               >
                 <LocaleStep />
