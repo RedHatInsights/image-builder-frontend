@@ -39,10 +39,17 @@ export const isMountpointMinSizeValid = (minSize: string) => {
   return /^\d+$/.test(minSize) && parseInt(minSize) > 0;
 };
 
-export const isBlueprintNameValid = (blueprintName: string) =>
-  blueprintName.length >= 2 &&
-  blueprintName.length <= 100 &&
-  /\w+/.test(blueprintName);
+export const isBlueprintNameValid = (blueprintName: string) => {
+  if (!blueprintName) {
+    return false;
+  }
+
+  return (
+    blueprintName.length >= 2 &&
+    blueprintName.length <= 100 &&
+    /\w+/.test(blueprintName)
+  );
+};
 
 export const isSnapshotDateValid = (date: Date) => date.getTime() <= Date.now();
 
