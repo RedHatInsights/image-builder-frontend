@@ -606,7 +606,6 @@ const CreateImageWizard = ({ isEdit }: CreateImageWizardProps) => {
             name="Details"
             id="step-details"
             navItem={customStatusNavItem}
-            status={detailsValidation.disabledNext ? 'error' : 'default'}
             footer={
               <CustomWizardFooter
                 disableNext={detailsValidation.disabledNext}

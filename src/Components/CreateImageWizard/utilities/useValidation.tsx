@@ -454,7 +454,7 @@ export function useDetailsValidation(): StepValidation {
   }, [blueprintId, name, setUniqueName, trigger, nameValid]);
 
   let nameError = '';
-  if (name && !nameValid) {
+  if (!nameValid) {
     nameError = 'Invalid blueprint name';
   } else if (uniqueName === false) {
     nameError = 'Blueprint with this name already exists';

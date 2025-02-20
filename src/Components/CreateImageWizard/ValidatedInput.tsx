@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   HelperText,
@@ -36,6 +36,7 @@ type HookValidatedInputPropTypes = TextInputProps &
     fieldName: string;
     warning?: string;
     inputType?: 'textInput' | 'textArea';
+    isRequired?: boolean;
   };
 
 export const HookPasswordValidatedInput = ({
@@ -50,6 +51,7 @@ export const HookPasswordValidatedInput = ({
   warning = undefined,
   inputType,
   isDisabled,
+  isRequired,
 }: HookValidatedInputPropTypes) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const togglePasswordVisibility = () => {
@@ -73,6 +75,7 @@ export const HookPasswordValidatedInput = ({
             inputType={inputType || 'textInput'}
             warning={warning || ''}
             isDisabled={isDisabled || false}
+            isRequired={isRequired || false}
           />
         </InputGroupItem>
         <InputGroupItem>
@@ -102,8 +105,10 @@ export const HookValidatedInput = ({
   type = 'text',
   inputType,
   warning = undefined,
+  isRequired = false,
 }: HookValidatedInputPropTypes) => {
-  const [isPristine, setIsPristine] = useState(!value ? true : false);
+  const isEmpty = value === undefined || value === null || value === '';
+  const [isPristine, setIsPristine] = useState(isEmpty);
   // Do not surface validation on pristine state components
   // Allow step validation to be set on pristine state, when needed
   const validated = isPristine
@@ -115,8 +120,17 @@ export const HookValidatedInput = ({
     : 'success';
 
   const handleBlur = () => {
-    setIsPristine(false);
+    if (isEmpty && !isRequired) {
+      setIsPristine(true);
+    } else {
+      setIsPristine(false);
+    }
   };
+  useEffect(() => {
+    if (isEmpty && !isRequired) {
+      setIsPristine(true);
+    }
+  }, [value, setIsPristine]);
 
   return (
     <>

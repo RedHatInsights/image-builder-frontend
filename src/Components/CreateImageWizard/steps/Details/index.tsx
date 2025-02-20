@@ -64,6 +64,7 @@ const DetailsStep = () => {
           placeholder="Add blueprint name"
           stepValidation={stepValidation}
           fieldName="name"
+          isRequired={true}
         />
         <FormHelperText>
           <HelperText>
