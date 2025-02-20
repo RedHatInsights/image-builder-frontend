@@ -27,7 +27,7 @@ const ImageDetail = () => {
   if (edgeParityFlag) {
     return (
       <AsyncComponent
-        appName="edge"
+        scope="edge"
         module="./ImagesDetail"
         ErrorComponent={<ErrorState />}
         navigateProp={useNavigate}
