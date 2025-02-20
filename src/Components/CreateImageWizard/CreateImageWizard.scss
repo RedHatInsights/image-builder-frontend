@@ -86,16 +86,13 @@ div.pf-v5-c-alert.pf-m-inline.pf-m-plain.pf-m-warning {
 }
 
 .pf-v5-c-wizard__main {
-    /* TO DO: This part of the code is responsible for the Wizard footer being fixed
-    at the bottom of the page. Unfortunately there's a new bug that's at least
-    partially caused by this styling: when zooming in or out while in Wizard,
-    the Wizard shrunks it's height to an unusable value.
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
 
-    Temporarily commenting out this code, until we figure out how the handle
-    this bug.
-    */
-    // flex: 1 1 0
-    
-    // TO DO: Remove after the fix
-    min-height: 800px;
+.pf-v5-c-wizard__footer {
+    position: sticky;
+    bottom: 0;
 }
